@@ -1,25 +1,81 @@
 [
   {
-    "img": "https://yt3.googleusercontent.com/ytc/AIdro_mS-XzXZcZ0xZ1xZ1xZ1xZ1xZ1xZ1xZ1xZ1xZ1x=s176-c-k-c0x00ffffff-no-rj",
-    "url": "https://youtube.com/@samwebster",
-    "label": "Sam Webster"
+    "id": "youtube",
+    "label": "YouTube",
+    "icon": "youtube",
+    "children": [
+        {
+            "img": "/src/assets/images/samwebster.png",
+            "url": "https://youtube.com/@samwebster",
+            "label": "Sam Webster"
+        },
+        {
+            "img": "/src/assets/images/living-springs-retreat.png",
+            "url": "https://youtube.com/@LivingSpringsRetreat",
+            "label": "Living Spring"
+        },
+        {
+            "img": "/src/assets/images/the-iitian-trader-official.png",
+            "url": "https://youtube.com/@theiitiantrader_official",
+            "label": "IITian Trader"
+        },
+      { "icon": "dollar", "url": "https://youtube.com/@besantmaheshwari", "label": "Basant M" },
+      { "icon": "heart", "url": "https://youtube.com/@drseemajain", "label": "Dr Seema" },
+      { "icon": "user", "url": "https://youtube.com/@indranilguha", "label": "Indranil" },
+      { "icon": "code", "url": "https://youtube.com/@apnacollegeofficial", "label": "Apna College" },
+      { "icon": "utensils", "url": "https://youtube.com/@cookingsorted", "label": "Cooking" },
+      { "icon": "activity", "url": "https://youtube.com/@askdoctors24", "label": "Ask Docs" },
+      { "icon": "message", "url": "https://youtube.com/@coachingwithbrookes", "label": "Brookes" },
+      { "icon": "help", "url": "https://youtube.com/@askhavivanything", "label": "Haviv" }
+    ]
   },
   {
-    "img": "https://yt3.googleusercontent.com/ytc/AIdro_k_4-_4-_4-_4-_4-_4-_4-_4-_4-_4-_4-_4-_4=s176-c-k-c0x00ffffff-no-rj",
-    "url": "https://youtube.com/@livingspringretreat",
-    "label": "Living Spring"
+    "id": "ai",
+    "label": "AI Tools",
+    "icon": "bot",
+    "children": [
+      { "icon": "message", "url": "https://claude.ai", "label": "Claude" },
+      { "icon": "bot", "url": "https://chatgpt.com", "label": "ChatGPT" },
+      { "icon": "code", "url": "https://chat.deepseek.com", "label": "DeepSeek" },
+      { "icon": "sun", "url": "https://gemini.google.com", "label": "Gemini" },
+      { "icon": "search", "url": "https://www.perplexity.ai", "label": "Perplexity" },
+      { "icon": "mic", "url": "https://otter.ai", "label": "Otter.ai" },
+      { "icon": "video", "url": "https://runwayml.com", "label": "RunwayML" },
+      { "icon": "image", "url": "https://www.midjourney.com", "label": "Midjourney" }
+    ]
   },
   {
-    "img": "https://yt3.googleusercontent.com/FfX_4-_4-_4-_4-_4-_4-_4-_4-_4-_4-_4-_4-_4-_4=s176-c-k-c0x00ffffff-no-rj",
-    "url": "https://youtube.com/@theiitiantrader",
-    "label": "IITian Trader"
+    "id": "trading",
+    "label": "Trading",
+    "icon": "trending",
+    "children": [
+      { "icon": "trending", "url": "https://tradingview.com", "label": "TradingView" },
+      { "icon": "dollar", "url": "https://zerodha.com", "label": "Zerodha" },
+      { "icon": "activity", "url": "https://sensibull.com", "label": "Sensibull" }
+    ]
   },
-  { "icon": "dollar", "url": "https://youtube.com/@besantmaheshwari", "label": "Basant M" },
-  { "icon": "heart", "url": "https://youtube.com/@drseemajain", "label": "Dr Seema" },
-  { "icon": "user", "url": "https://youtube.com/@indranilguha", "label": "Indranil" },
-  { "icon": "code", "url": "https://youtube.com/@apnacollegeofficial", "label": "Apna College" },
-  { "icon": "utensils", "url": "https://youtube.com/@cookingsorted", "label": "Cooking" },
-  { "icon": "activity", "url": "https://youtube.com/@askdoctors24", "label": "Ask Docs" },
-  { "icon": "message", "url": "https://youtube.com/@coachingwithbrookes", "label": "Brookes" },
-  { "icon": "help", "url": "https://youtube.com/@askhavivanything", "label": "Haviv" }
+  {
+    "id": "nmmc",
+    "label": "NMMC",
+    "icon": "building",
+    "url": "https://www.nmmc.gov.in/"
+  },
+  {
+    "id": "nishith",
+    "label": "Nishith",
+    "icon": "user",
+    "url": "https://nishith.is-a.dev"
+  },
+  {
+    "id": "cloudinary",
+    "label": "Cloudinary",
+    "icon": "cloud",
+    "url": "https://cloudinary.com"
+  },
+  {
+    "id": "render",
+    "label": "Render",
+    "icon": "server",
+    "url": "https://render.com"
+  }
 ]
