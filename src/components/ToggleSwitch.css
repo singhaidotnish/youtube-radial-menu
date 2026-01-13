@@ -57,7 +57,7 @@
 .toggle-inner:before {
   content: attr(data-yes);
   /* FIXED: Added padding to push text away from the left edge so it isn't hidden */
-  padding-left: 46px; 
+  padding-left: 9px; 
   /* FIXED: Changed Green to White/Grey to match the 2D side */
   color: #e0e0e0; 
   text-shadow: 0 -1px 1px rgba(0,0,0,1); /* Inset text effect */
@@ -90,7 +90,7 @@
     0 2px 4px rgba(0,0,0,0.5), /* Shadow below button */
     inset 0 1px 2px rgba(255,255,255,1); /* Highlight on top edge */
     
-  border: 4px solid #c5c5c5;
+  border: 1px solid #555;
   transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
