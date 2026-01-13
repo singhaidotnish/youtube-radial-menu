@@ -82,7 +82,7 @@ function Sun({ onReset }) {
                 
                 {/* Color: Exact match to your 2D Orange (#ffaa00) */}
                 <meshStandardMaterial 
-                    color="#ffaa00" 
+                    color="#d4a017" 
                     emissive="#ff4400" 
                     emissiveIntensity={1.5} 
                 />
