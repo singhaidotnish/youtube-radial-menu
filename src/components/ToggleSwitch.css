@@ -1,23 +1,103 @@
-.toggle-image {
+/* 1. Position the Widget */
+.toggle-wrapper {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 10000;
-  
-  width: 140px;
-  height: auto;
-  cursor: pointer;
-  transition: transform 0.1s ease-in-out;
-
-  /* --- THE FIX --- */
-  /* This rounds the corners so high that it becomes a pill shape */
-  border-radius: 100px; 
-  /* This ensures no white background leaks outside the border */
-  overflow: hidden; 
-  /* Optional: Adds a subtle shadow so it pops off the stars */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.945);
 }
 
-.toggle-image:active {
-  transform: scale(0.95);
+/* Hide the ugly default checkbox */
+.toggle-checkbox {
+  display: none;
+}
+
+/* 2. THE TRACK (The Black Groove) */
+.toggle-label {
+  display: block;
+  overflow: hidden;
+  cursor: pointer;
+  width: 90px;  /* Width of the widget */
+  height: 36px; /* Height of the widget */
+  border-radius: 36px;
+  
+  /* PAINTING THE BLACK BACKGROUND */
+  background: #000000; /* Pure Black */
+  border: 1px solid #333; /* Dark Grey Border */
+  
+  /* "INSET" Shadow makes it look sunken into the screen */
+  box-shadow: inset 0px 3px 8px rgba(255, 255, 255, 0.1), /* Subtle top light */
+              inset 0px 5px 10px rgba(0, 0, 0, 0.9);      /* Deep bottom shadow */
+  
+  position: relative;
+  transition: background-color 0.2s ease-in;
+}
+
+/* 3. THE TEXT (2D / 3D Labels) */
+.toggle-inner {
+  display: block;
+  width: 200%;
+  margin-left: -100%;
+  transition: margin 0.3s ease-in 0s;
+  height: 36px;
+}
+
+.toggle-inner:before, .toggle-inner:after {
+  display: block;
+  float: left;
+  width: 50%;
+  height: 36px;
+  padding: 0;
+  line-height: 36px;
+  font-size: 14px;
+  font-weight: bold;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+/* Text for "ON" (3D) side */
+.toggle-inner:before {
+  content: attr(data-yes);
+  padding-left: 15px;
+  color: #4cd964; /* Green Text */
+  text-shadow: 0 0 5px rgba(76, 217, 100, 0.5); /* Glowing Text */
+}
+
+/* Text for "OFF" (2D) side */
+.toggle-inner:after {
+  content: attr(data-no);
+  padding-right: 15px;
+  color: #999; /* Grey Text */
+  text-align: right;
+}
+
+/* 4. THE THUMB (The Metallic Button) */
+.toggle-switch {
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(to bottom, #ffffff 0%, #a1a1a1 100%); /* Silver Gradient */
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  bottom: 0;
+  right: 56px; /* Starting position */
+  
+  /* Drop shadow makes it pop OUT of the groove */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  border: 1px solid #999;
+  
+  transition: all 0.3s ease-in 0s; 
+}
+
+/* --- ANIMATION STATES --- */
+
+/* When Checked (3D Mode) */
+.toggle-checkbox:checked + .toggle-label .toggle-inner {
+  margin-left: 0;
+}
+
+.toggle-checkbox:checked + .toggle-label .toggle-switch {
+  right: 4px; /* Move button to the right */
+  background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%); /* Brighter when active */
+  box-shadow: 0 0 10px white; /* Glow effect when active */
 }

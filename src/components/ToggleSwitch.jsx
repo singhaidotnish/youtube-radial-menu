@@ -3,13 +3,19 @@ import './ToggleSwitch.css';
 
 const ToggleSwitch = ({ is3D, onToggle }) => {
   return (
-    <img 
-      /* Logic: If is3D is true, show 3d.png. If false, show 2d.png */
-      src={is3D ? "images/3d.png" : "images/2d.png"} 
-      alt="Toggle View"
-      className="toggle-image"
-      onClick={onToggle}
-    />
+    <div className="toggle-wrapper">
+      <input 
+        className="toggle-checkbox" 
+        type="checkbox" 
+        checked={is3D} 
+        onChange={onToggle} 
+        id="toggle-3d"
+      />
+      <label className="toggle-label" htmlFor="toggle-3d">
+        <span className="toggle-inner" data-yes="3D" data-no="2D"></span>
+        <span className="toggle-switch"></span>
+      </label>
+    </div>
   );
 };
 
