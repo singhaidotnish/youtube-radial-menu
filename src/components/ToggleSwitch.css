@@ -9,12 +9,13 @@
   cursor: pointer;
   transition: transform 0.1s ease-in-out;
 
-  /* HIDES THE WHITE BACKGROUND BOX */
-  mix-blend-mode: lighten; 
-  /* 'lighten' or 'screen' usually works best for white-on-black. 
-     If this makes the button invisible, try removing this line and 
-     adding 'border-radius: 20px;' to just round off the corners. */
-  border-radius: 30px; 
+  /* --- THE FIX --- */
+  /* This rounds the corners so high that it becomes a pill shape */
+  border-radius: 100px; 
+  /* This ensures no white background leaks outside the border */
+  overflow: hidden; 
+  /* Optional: Adds a subtle shadow so it pops off the stars */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .toggle-image:active {
