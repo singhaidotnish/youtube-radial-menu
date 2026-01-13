@@ -57,7 +57,7 @@
 .toggle-inner:before {
   content: attr(data-yes);
   /* FIXED: Added padding to push text away from the left edge so it isn't hidden */
-  padding-left: 9px; 
+  padding-left: 1px; 
   /* FIXED: Changed Green to White/Grey to match the 2D side */
   color: #e0e0e0; 
   text-shadow: 0 -1px 1px rgba(0,0,0,1); /* Inset text effect */
