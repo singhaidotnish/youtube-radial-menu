@@ -2,17 +2,21 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 10000; /* Keeps it on top of the 3D canvas */
+  z-index: 10000;
   
-  width: 140px;   /* Adjust this size if the button looks too big/small */
-  height: auto;   /* Maintains the original aspect ratio */
+  width: 140px;
+  height: auto;
   cursor: pointer;
-  
-  /* Adds a smooth animation when you click it */
   transition: transform 0.1s ease-in-out;
+
+  /* HIDES THE WHITE BACKGROUND BOX */
+  mix-blend-mode: lighten; 
+  /* 'lighten' or 'screen' usually works best for white-on-black. 
+     If this makes the button invisible, try removing this line and 
+     adding 'border-radius: 20px;' to just round off the corners. */
+  border-radius: 30px; 
 }
 
-/* Optional: Shrink slightly when clicked for a tactile feel */
 .toggle-image:active {
   transform: scale(0.95);
 }
