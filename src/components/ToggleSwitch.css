@@ -9,13 +9,16 @@
   cursor: pointer;
   transition: transform 0.1s ease-in-out;
 
-  /* --- THE FIX --- */
-  /* This rounds the corners so high that it becomes a pill shape */
-  border-radius: 100px; 
-  /* This ensures no white background leaks outside the border */
-  overflow: hidden; 
-  /* Optional: Adds a subtle shadow so it pops off the stars */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.945);
+  /* --- THE MAGIC FIX --- */
+  /* 1. invert(1): Turns White to Black (and Black to White) */
+  /* 2. hue-rotate: Keeps any colors (like green/blue) looking correct-ish */
+  filter: invert(1) hue-rotate(180deg);
+
+  /* 3. Clip the corners so it is a perfect pill shape */
+  border-radius: 50px;
+  
+  /* 4. Ensure it sits nicely on top */
+  mix-blend-mode: normal; 
 }
 
 .toggle-image:active {
