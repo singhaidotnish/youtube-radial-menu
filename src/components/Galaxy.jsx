@@ -70,14 +70,41 @@ function Planet({ item, index, total, radius, isActive, onClick }) {
 
 function Sun({ onReset }) {
     const sunRef = useRef();
+
+    // Slowly rotate the sun for a 3D effect, or remove useFrame to make it static like 2D
     useFrame((state, delta) => (sunRef.current.rotation.y += delta * 0.2));
+
     return (
-        <group onClick={onReset}>
-            <mesh ref={sunRef}>
-                <sphereGeometry args={[2.5, 32, 32]} />
-                <meshStandardMaterial color="#ffaa00" emissive="#ff4400" emissiveIntensity={2} />
+        <group ref={sunRef} onClick={onReset}>
+            {/* 1. THE BODY: Matches 2D Orange Color */}
+            <mesh>
+                <sphereGeometry args={[2.5, 64, 64]} />
+                <meshStandardMaterial 
+                    color="#ffaa00" 
+                    emissive="#ffaa00" 
+                    emissiveIntensity={0.4} 
+                    roughness={0.2} 
+                />
             </mesh>
-            <Text position={[0, 0, 3]} fontSize={0.8} color="white" anchorX="center" anchorY="middle">START</Text>
+
+            {/* 2. THE RIM: A White Ring to match the 2D border */}
+            <mesh>
+                {/* Torus args: [radius, tubeThickness, radialSegments, tubularSegments] */}
+                <torusGeometry args={[2.5, 0.15, 16, 100]} />
+                <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.5} />
+            </mesh>
+
+            {/* 3. THE TEXT: "START" */}
+            <Text 
+                position={[0, 0, 2.7]} // Floats slightly in front of the sphere
+                fontSize={0.8} 
+                fontWeight="bold"
+                color="white" 
+                anchorX="center" 
+                anchorY="middle"
+            >
+                START
+            </Text>
         </group>
     )
 }
