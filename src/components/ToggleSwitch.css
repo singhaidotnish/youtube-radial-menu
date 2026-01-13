@@ -6,38 +6,37 @@
   z-index: 10000;
 }
 
-/* Hide the ugly default checkbox */
 .toggle-checkbox {
   display: none;
 }
 
-/* 2. THE TRACK (The Black Groove) */
+/* 2. THE TRACK (Deep 3D Groove) */
 .toggle-label {
   display: block;
   overflow: hidden;
   cursor: pointer;
-  width: 90px;  /* Width of the widget */
-  height: 36px; /* Height of the widget */
+  width: 90px;
+  height: 36px;
   border-radius: 36px;
-  
-  /* PAINTING THE BLACK BACKGROUND */
   background: #000000; /* Pure Black */
-  border: 1px solid #333; /* Dark Grey Border */
   
-  /* "INSET" Shadow makes it look sunken into the screen */
-  box-shadow: inset 0px 3px 8px rgba(255, 255, 255, 0.1), /* Subtle top light */
-              inset 0px 5px 10px rgba(0, 0, 0, 0.9);      /* Deep bottom shadow */
-  
+  /* FIXED: Stronger 3D borders and shadows */
+  border: 2px solid #222; 
+  box-shadow: 
+    inset 0px 5px 10px rgba(0,0,0,1),   /* Deep inner shadow top */
+    inset 0px -1px 1px rgba(255,255,255,0.1), /* Subtle bottom rim light */
+    0px 2px 5px rgba(0,0,0,0.5); /* Drop shadow on the page */
+    
   position: relative;
   transition: background-color 0.2s ease-in;
 }
 
-/* 3. THE TEXT (2D / 3D Labels) */
+/* 3. THE SLIDING TEXT CONTAINER */
 .toggle-inner {
   display: block;
   width: 200%;
   margin-left: -100%;
-  transition: margin 0.3s ease-in 0s;
+  transition: margin 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); /* Smoother slide */
   height: 36px;
 }
 
@@ -47,57 +46,65 @@
   width: 50%;
   height: 36px;
   padding: 0;
-  line-height: 36px;
+  line-height: 34px; /* Vertically centered */
   font-size: 14px;
   font-weight: bold;
   font-family: sans-serif;
   box-sizing: border-box;
 }
 
-/* Text for "ON" (3D) side */
+/* 4. TEXT STYLES (Fixed Clipping & Color) */
 .toggle-inner:before {
   content: attr(data-yes);
-  padding-left: 15px;
-  color: #4cd964; /* Green Text */
-  text-shadow: 0 0 5px rgba(76, 217, 100, 0.5); /* Glowing Text */
+  /* FIXED: Added padding to push text away from the left edge so it isn't hidden */
+  padding-left: 18px; 
+  /* FIXED: Changed Green to White/Grey to match the 2D side */
+  color: #e0e0e0; 
+  text-shadow: 0 -1px 1px rgba(0,0,0,1); /* Inset text effect */
 }
 
-/* Text for "OFF" (2D) side */
 .toggle-inner:after {
   content: attr(data-no);
-  padding-right: 15px;
-  color: #999; /* Grey Text */
+  padding-right: 18px;
+  color: #999;
   text-align: right;
+  text-shadow: 0 -1px 1px rgba(0,0,0,1);
 }
 
-/* 4. THE THUMB (The Metallic Button) */
+/* 5. THE THUMB (Metallic Knob) */
 .toggle-switch {
   display: block;
   width: 30px;
   height: 30px;
-  background: linear-gradient(to bottom, #ffffff 0%, #a1a1a1 100%); /* Silver Gradient */
   border-radius: 50%;
   position: absolute;
   top: 3px;
   bottom: 0;
-  right: 56px; /* Starting position */
+  right: 56px;
   
-  /* Drop shadow makes it pop OUT of the groove */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-  border: 1px solid #999;
+  /* FIXED: Better Metallic Gradient */
+  background: linear-gradient(180deg, #ffffff 0%, #a0a0a0 100%);
   
-  transition: all 0.3s ease-in 0s; 
+  /* FIXED: 3D Pop-out effect */
+  box-shadow: 
+    0 2px 4px rgba(0,0,0,0.5), /* Shadow below button */
+    inset 0 1px 2px rgba(255,255,255,1); /* Highlight on top edge */
+    
+  border: 1px solid #555;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
 /* --- ANIMATION STATES --- */
-
-/* When Checked (3D Mode) */
 .toggle-checkbox:checked + .toggle-label .toggle-inner {
   margin-left: 0;
 }
 
 .toggle-checkbox:checked + .toggle-label .toggle-switch {
-  right: 4px; /* Move button to the right */
-  background: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 100%); /* Brighter when active */
-  box-shadow: 0 0 10px white; /* Glow effect when active */
+  right: 4px; 
+  /* Brighter silver when ON */
+  background: linear-gradient(180deg, #ffffff 0%, #c0c0c0 100%);
+  box-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.3), /* Glow */
+    0 2px 4px rgba(0,0,0,0.5),
+    inset 0 1px 2px rgba(255,255,255,1);
 }
