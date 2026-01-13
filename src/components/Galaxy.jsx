@@ -80,11 +80,13 @@ function Sun({ onReset }) {
                 {/* Size: 2.5 matches the visual weight of your 2D button */}
                 <sphereGeometry args={[2.5, 32, 32]} />
                 
-                {/* Color: Exact match to your 2D Orange (#ffaa00) */}
+                {/* COLOR MATCH: #ffaa00 (Solid Orange) to match 2D Start Button */}
                 <meshStandardMaterial 
-                    color="rgba(212, 160, 23, 1.0)" 
+                    color="#ffaa00" 
                     emissive="#ff4400" 
-                    emissiveIntensity={1.5} 
+                    emissiveIntensity={2} 
+                    roughness={0.2}
+                    metalness={0.1}
                 />
             </mesh>
             
