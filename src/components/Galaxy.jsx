@@ -71,28 +71,30 @@ function Planet({ item, index, total, radius, isActive, onClick }) {
 function Sun({ onReset }) {
     const sunRef = useRef();
     
-    // Gentle rotation
+    // Rotate the text and sun together
     useFrame((state, delta) => (sunRef.current.rotation.y += delta * 0.2));
 
     return (
-        <group onClick={onReset}>
-            <mesh ref={sunRef}>
-                {/* Size: 2.5 matches the visual weight of your 2D button */}
+        <group onClick={onReset} ref={sunRef}>
+            {/* 1. THE WHITE BORDER (Outline Trick) */}
+            {/* We render a slightly larger white sphere with "BackSide". 
+                This creates a perfect white outline visible from any angle. */}
+            <mesh>
+                <sphereGeometry args={[2.65, 32, 32]} />
+                <meshBasicMaterial color="white" side={THREE.BackSide} />
+            </mesh>
+
+            {/* 2. THE SUN (Solid Bright Orange) */}
+            <mesh>
                 <sphereGeometry args={[2.5, 32, 32]} />
-                
-                {/* COLOR MATCH: #ffaa00 (Solid Orange) to match 2D Start Button */}
-                <meshStandardMaterial 
-                    color="#ffaa00" 
-                    emissive="#ff4400" 
-                    emissiveIntensity={2} 
-                    roughness={0.2}
-                    metalness={0.1}
-                />
+                {/* meshBasicMaterial is KEY. It ignores lighting, so it never looks brown.
+                    It will always match your #ffaa00 CSS color exactly. */}
+                <meshBasicMaterial color="#ffaa00" />
             </mesh>
             
-            {/* Text floats cleanly in the center */}
+            {/* 3. THE TEXT */}
             <Text 
-                position={[0, 0, 2.8]} 
+                position={[0, 0, 2.7]} 
                 fontSize={0.8} 
                 color="white" 
                 fontWeight="bold"

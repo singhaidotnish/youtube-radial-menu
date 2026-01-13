@@ -15,7 +15,7 @@
   /* This ensures no white background leaks outside the border */
   overflow: hidden; 
   /* Optional: Adds a subtle shadow so it pops off the stars */
-  box-shadow: 0 0 10px rgb(0, 0, 0);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.945);
 }
 
 .toggle-image:active {
