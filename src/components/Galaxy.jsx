@@ -70,36 +70,30 @@ function Planet({ item, index, total, radius, isActive, onClick }) {
 
 function Sun({ onReset }) {
     const sunRef = useRef();
-
-    // Slowly rotate the sun for a 3D effect, or remove useFrame to make it static like 2D
+    
+    // Gentle rotation
     useFrame((state, delta) => (sunRef.current.rotation.y += delta * 0.2));
 
     return (
-        <group ref={sunRef} onClick={onReset}>
-            {/* 1. THE BODY: Matches 2D Orange Color */}
-            <mesh>
-                <sphereGeometry args={[2.5, 64, 64]} />
+        <group onClick={onReset}>
+            <mesh ref={sunRef}>
+                {/* Size: 2.5 matches the visual weight of your 2D button */}
+                <sphereGeometry args={[2.5, 32, 32]} />
+                
+                {/* Color: Exact match to your 2D Orange (#ffaa00) */}
                 <meshStandardMaterial 
                     color="#ffaa00" 
-                    emissive="#ffaa00" 
-                    emissiveIntensity={0.4} 
-                    roughness={0.2} 
+                    emissive="#ff4400" 
+                    emissiveIntensity={1.5} 
                 />
             </mesh>
-
-            {/* 2. THE RIM: A White Ring to match the 2D border */}
-            <mesh>
-                {/* Torus args: [radius, tubeThickness, radialSegments, tubularSegments] */}
-                <torusGeometry args={[2.5, 0.15, 16, 100]} />
-                <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.5} />
-            </mesh>
-
-            {/* 3. THE TEXT: "START" */}
+            
+            {/* Text floats cleanly in the center */}
             <Text 
-                position={[0, 0, 2.7]} // Floats slightly in front of the sphere
+                position={[0, 0, 2.8]} 
                 fontSize={0.8} 
-                fontWeight="bold"
                 color="white" 
+                fontWeight="bold"
                 anchorX="center" 
                 anchorY="middle"
             >
