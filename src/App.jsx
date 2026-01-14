@@ -3,7 +3,7 @@ import RadialMenu from './components/RadialMenu'
 import Galaxy from './components/Galaxy'
 import ToggleSwitch from './components/ToggleSwitch'
 import './App.css'
-
+// Working version of the app with proper 2d and 3d switching
 function App() {
   const [viewMode, setViewMode] = useState('2d');
 
