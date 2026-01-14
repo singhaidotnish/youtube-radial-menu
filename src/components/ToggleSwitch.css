@@ -1,78 +1,85 @@
-/* 1. THE HOUSING (The Double Oval) */
-.toggle-housing {
+/* 1. CONTAINER: Positioning & Background */
+.toggle-container {
+  /* --- POSITIONING FIX --- */
   position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 10000;
-  cursor: pointer;
+  top: 30px;  /* Distance from top */
+  left: 30px; /* Distance from left (Moved to Top-Left) */
+  z-index: 10001; /* High number ensures it's clearly visible on top of stars */
   
-  /* Size */
-  width: 90px;
+  /* Size & Shape */
+  width: 100px;
   height: 40px;
+  background: #000000; /* Pure black background */
+  border-radius: 40px; /* Capsule shape */
   
-  /* Black Background for the track */
-  background: #000000;
-  border-radius: 50px;
+  /* Outer Border (The "Housing") */
+  border: 2px solid #333; 
+  box-shadow: 0 4px 15px rgba(0,0,0,0.8); /* Drop shadow for depth */
   
-  /* --- THE DOUBLE RIM EFFECT --- */
-  /* Inner Border (Dark Grey) */
-  border: 4px solid #1a1a1a; 
-  /* Outer Glow/Ring (Lighter Grey to separate it from space) */
-  box-shadow: 
-    0 0 0 1px #444,             /* Thin outer definition line */
-    0 4px 10px rgba(0,0,0,0.5); /* Drop shadow */
-
-  position: relative; /* Container for absolute children */
-  box-sizing: content-box; /* Ensures border adds to width */
+  cursor: pointer;
+  overflow: hidden; /* Keeps the moving ring inside the capsule */
 }
 
-/* 2. THE TEXT LABELS */
-.toggle-text {
+/* 2. THE MOVING RING (The "Oval") */
+.toggle-ring {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 4px; /* Spacing from top edge */
+  left: 4px; /* Starting position inside the capsule */
   
+  width: 44px; /* Almost half the width (leaving space for gaps) */
+  height: 28px; /* Slightly smaller than container height */
+  border-radius: 20px;
+  
+  /* --- THE RING STYLE --- */
+  /* Transparent center, but with a glowing border */
+  background: transparent; 
+  border: 2px solid #ffaa00; /* Orange Border (Matches your "Start" button) */
+  box-shadow: 0 0 8px rgba(255, 170, 0, 0.5); /* Orange Glow */
+  
+  /* Animation Physics */
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+  z-index: 1; /* Sits BEHIND the text */
+}
+
+/* 3. RING POSITIONS */
+/* 3D Mode: Ring moves to Left */
+.pos-left {
+  transform: translateX(0px); 
+}
+
+/* 2D Mode: Ring moves to Right */
+.pos-right {
+  transform: translateX(48px); /* Slides 48px to the right */
+}
+
+/* 4. TEXT CONTAINER */
+.toggle-labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  
+  display: flex;
+  justify-content: space-between; /* Spreads text to left and right */
+  align-items: center; /* Centers text vertically */
+  padding: 0 16px; /* Space from edges */
+  box-sizing: border-box;
+  z-index: 2; /* Text sits ON TOP of the ring */
+}
+
+/* 5. TEXT STYLING */
+.toggle-text {
   font-family: sans-serif;
   font-weight: bold;
   font-size: 14px;
-  color: #ffffff; /* Bright White */
-  z-index: 1; /* Sits underneath the knob */
+  color: #555; /* Default Dark Grey (Inactive) */
+  transition: color 0.3s;
   user-select: none;
 }
 
-.toggle-text.left {
-  left: 14px; /* Position of "3D" */
-}
-
-.toggle-text.right {
-  right: 14px; /* Position of "2D" */
-}
-
-/* 3. THE KNOB (Silver Circle) */
-.toggle-knob {
-  position: absolute;
-  top: 2px;
-  left: 2px; /* STARTING POSITION (Left / 2D Mode) */
-  
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  
-  /* Silver Metallic Gradient */
-  background: linear-gradient(180deg, #ffffff 0%, #b0b0b0 100%);
-  
-  /* Shadow to pop off the background */
-  box-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  
-  /* Sits ON TOP of the text to cover it */
-  z-index: 2; 
-  
-  /* Smooth Slide Animation */
-  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-
-/* --- ACTIVE STATE (3D Mode) --- */
-/* Slide Knob to the Right */
-.toggle-knob.active {
-  transform: translateX(50px); 
+/* ACTIVE TEXT (When the Ring is under it) */
+.toggle-text.active {
+  color: #ffffff; /* Turns White */
+  text-shadow: 0 0 5px rgba(255,255,255,0.8); /* Slight glow */
 }

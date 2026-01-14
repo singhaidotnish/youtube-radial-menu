@@ -3,17 +3,19 @@ import './ToggleSwitch.css';
 
 const ToggleSwitch = ({ is3D, onToggle }) => {
   return (
-    /* The Container (Double Oval Housing) */
-    <div className="toggle-housing" onClick={onToggle}>
+    <div className="toggle-container" onClick={onToggle}>
       
-      {/* TEXT: "3D" (Sits on the Left) */}
-      <span className="toggle-text left">3D</span>
-      
-      {/* TEXT: "2D" (Sits on the Right) */}
-      <span className="toggle-text right">2D</span>
+      {/* 1. THE MOVING RING (The "Oval" that slides) */}
+      <div className={`toggle-ring ${is3D ? 'pos-left' : 'pos-right'}`}></div>
 
-      {/* THE KNOB (Silver Circle that slides) */}
-      <div className={`toggle-knob ${is3D ? 'active' : ''}`}></div>
+      {/* 2. THE LABELS (Sits on top of the ring) */}
+      <div className="toggle-labels">
+        {/* If is3D is true, this text lights up */}
+        <span className={`toggle-text ${is3D ? 'active' : ''}`}>3D</span>
+        
+        {/* If is3D is false (2D mode), this text lights up */}
+        <span className={`toggle-text ${!is3D ? 'active' : ''}`}>2D</span>
+      </div>
       
     </div>
   );
