@@ -3,18 +3,15 @@ import './ToggleSwitch.css';
 
 const ToggleSwitch = ({ is3D, onToggle }) => {
   return (
-    <div className="toggle-wrapper">
-      <input 
-        className="toggle-checkbox" 
-        type="checkbox" 
-        checked={is3D} 
-        onChange={onToggle} 
-        id="toggle-3d"
-      />
-      <label className="toggle-label" htmlFor="toggle-3d">
-        <span className="toggle-inner" data-yes="3D" data-no="2D"></span>
-        <span className="toggle-switch"></span>
-      </label>
+    <div className="toggle-container" onClick={onToggle}>
+      {/* 1. The Sliding Highlight (The "Ring" that moves) */}
+      <div className={`toggle-glider ${is3D ? 'position-left' : 'position-right'}`}></div>
+
+      {/* 2. The Text Labels (Clickable) */}
+      <div className="toggle-labels">
+        <span className={`toggle-option ${is3D ? 'active' : ''}`}>3D</span>
+        <span className={`toggle-option ${!is3D ? 'active' : ''}`}>2D</span>
+      </div>
     </div>
   );
 };
