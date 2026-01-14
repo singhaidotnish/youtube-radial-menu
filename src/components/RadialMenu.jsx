@@ -8,7 +8,6 @@ import {
 import "./RadialMenu.css";
 import data from '../data.json';
 
-// --- Math Helpers ---
 const polarToCartesian = (radius, angleInDegrees) => {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
   return {
@@ -22,7 +21,6 @@ const getSectorPath = (outerRadius, innerRadius, startAngle, endAngle) => {
   const end = polarToCartesian(outerRadius, startAngle);
   const startInner = polarToCartesian(innerRadius, endAngle);
   const endInner = polarToCartesian(innerRadius, startAngle);
-
   const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 
   return [
@@ -62,7 +60,9 @@ const RadialMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState(null);
   
-  // CONFIGURATION
+  // 1. TOOLTIP STATE
+  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, text: '' });
+  
   const GAP = 2; 
   const R1_INNER = 60;
   const R1_OUTER = 140; 
@@ -82,28 +82,34 @@ const RadialMenu = () => {
     setActiveGroup(activeGroup === groupId ? null : groupId);
   };
 
+  // 2. MOUSE HANDLERS
+  const handleMouseEnter = (e, text) => {
+    setTooltip({ show: true, x: e.clientX, y: e.clientY, text });
+  };
+
+  const handleMouseMove = (e) => {
+    setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip(prev => ({ ...prev, show: false }));
+  };
+
   const renderSlice = (item, index, total, innerR, outerR, isGroupParent) => {
     const sliceAngle = 360 / total;
     const startAngle = (index * sliceAngle) + (GAP / 2);
     const endAngle = ((index + 1) * sliceAngle) - (GAP / 2);
     
-    // 1. Calculate the Shape Path
     const pathData = getSectorPath(outerR, innerR, startAngle, endAngle);
     
-    // 2. Calculate Center Point (for icon or image positioning)
     const midAngle = startAngle + (sliceAngle - GAP)/2;
     const iconRadius = innerR + (outerR - innerR) / 2;
     const pos = polarToCartesian(iconRadius, midAngle);
 
-    // 3. Highlight Logic
     const isActive = activeGroup === item.id;
     const defaultFill = "rgba(30, 35, 40, 0.85)";
     const activeFill = "#d4a017";
-
-    // 4. Unique ID for clipping (Essential!)
     const clipId = `clip-${isGroupParent ? 'parent' : 'child'}-${index}`;
-
-    // Image Sizing (make it big enough to cover the whole wedge)
     const imgSize = 160; 
 
     return (
@@ -111,13 +117,16 @@ const RadialMenu = () => {
         key={item.label || index} 
         className="slice-group"
         onClick={(e) => isGroupParent && item.children ? handleGroupClick(e, item.id) : null}
+        // 3. ATTACH EVENTS TO THE GROUP
+        onMouseEnter={(e) => handleMouseEnter(e, item.label)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
       >
         <a 
           href={item.children ? "#" : item.url} 
           target={item.children ? "_self" : "_blank"}
           rel="noopener noreferrer"
         >
-          {/* A. If it's an Image, we render it CLIPPED by the path */}
           {item.img && (
             <>
               <defs>
@@ -131,15 +140,13 @@ const RadialMenu = () => {
                 y={pos.y - (imgSize/2)} 
                 width={imgSize} 
                 height={imgSize} 
-                preserveAspectRatio="xMidYMid slice" // This acts like object-fit: cover
+                preserveAspectRatio="xMidYMid slice" 
                 clipPath={`url(#${clipId})`}
                 className="sector-bg-image"
               />
             </>
           )}
 
-          {/* B. The Interaction Layer (Stroke & Overlay) */}
-          {/* If there is an image, we make the fill semi-transparent so the image shows through */}
           <path 
             d={pathData} 
             fill={item.img ? (isActive ? "rgba(212, 160, 23, 0.4)" : "rgba(0,0,0,0.4)") : (isActive ? activeFill : defaultFill)} 
@@ -148,7 +155,6 @@ const RadialMenu = () => {
             className="slice-path"
           />
 
-          {/* C. The Icon (Only show if NO image) */}
           {!item.img && (
             <foreignObject 
               x={pos.x - 14} 
@@ -214,6 +220,19 @@ const RadialMenu = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* 4. RENDER THE TOOLTIP HERE */}
+      {tooltip.show && (
+        <div 
+          className="radial-tooltip"
+          style={{ 
+            top: tooltip.y, 
+            left: tooltip.x 
+          }}
+        >
+          {tooltip.text}
+        </div>
+      )}
     </div>
   );
 };

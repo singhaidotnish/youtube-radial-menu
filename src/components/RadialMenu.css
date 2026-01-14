@@ -143,3 +143,23 @@
   width: 100%;
   height: 100%;
 }
+
+/* Floating Tooltip */
+.radial-tooltip {
+  position: fixed; /* Fixed relative to screen */
+  background-color: rgba(0, 0, 0, 0.9); /* Dark black background */
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: sans-serif;
+  font-weight: 500;
+  pointer-events: none; /* Crucial: lets mouse pass through to click buttons */
+  z-index: 10000; /* Stays on top of everything */
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  
+  /* Offset it slightly from the cursor so it doesn't block visibility */
+  transform: translate(15px, 15px);
+}
