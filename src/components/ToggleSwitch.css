@@ -1,80 +1,86 @@
-/* 1. The Container (The Dark Track) */
-.toggle-container {
+/* 1. POSITIONING & HOUSING (The "Double Oval") */
+.toggle-housing {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 10000;
-  
-  width: 100px;  /* Width of the whole switch */
-  height: 40px;  /* Height of the switch */
-  background: #000000; /* Pure Black Background */
-  border-radius: 50px; /* Capsule shape */
-  
-  /* Deep inset shadow to look like a housing */
-  box-shadow: 
-    inset 0 2px 5px rgba(0,0,0,1), 
-    inset 0 -1px 1px rgba(255,255,255,0.1),
-    0 0 0 2px #222; /* Outer grey ring */
-    
   cursor: pointer;
-  overflow: hidden; /* Keeps everything inside the capsule */
-  position: relative; /* Needed for absolute positioning children */
-}
-
-/* 2. The Slider/Glider (The Shiny Moving Oval) */
-.toggle-glider {
-  position: absolute;
-  top: 4px;
-  left: 4px;
-  width: 46px; /* Almost half the width */
-  height: 32px;
+  
+  /* Size of the whole widget */
+  width: 90px;
+  height: 40px;
+  
+  /* --- THE DOUBLE OVAL EFFECT --- */
   border-radius: 40px;
+  background: #000; /* Inner Track Color */
   
-  /* METALLIC LOOK */
-  background: linear-gradient(180deg, #ffffff 0%, #bbbbbb 100%);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  /* Layer 1: The Dark Grey Rim (Inner Border) */
+  border: 4px solid #1a1a1a; 
   
-  /* Animation Physics */
-  transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bouncy effect */
-  z-index: 1; /* Sits BEHIND the text but ABOVE background */
+  /* Layer 2: The Outer Highlight (Outer Ring) */
+  box-shadow: 
+    0 0 0 1px #444, /* Thin outer grey line */
+    0 4px 10px rgba(0,0,0,0.5); /* Drop shadow */
+    
+  overflow: hidden; /* Keeps content inside */
+  box-sizing: content-box; /* Ensures borders add to size */
 }
 
-/* 3. Positioning the Glider */
-.position-left {
-  transform: translateX(0px); /* 3D Position */
-}
-
-.position-right {
-  transform: translateX(46px); /* 2D Position (Moves to right) */
-}
-
-/* 4. Text Labels Container */
-.toggle-labels {
-  position: absolute;
-  top: 0;
-  left: 0;
+/* 2. THE TRACK (Holds the text) */
+.toggle-track {
+  position: relative;
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 14px; /* Spacing for text */
-  box-sizing: border-box;
-  z-index: 2; /* Text must sit ON TOP of the glider */
 }
 
-/* 5. The Text Styles */
-.toggle-option {
+/* 3. THE TEXT LABELS */
+.toggle-text {
+  position: absolute;
   font-family: sans-serif;
   font-weight: bold;
   font-size: 14px;
-  color: #666; /* Default (Inactive) Color */
-  transition: color 0.3s;
-  user-select: none;
+  color: #fff;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 0; /* Hidden by default */
+  pointer-events: none;
 }
 
-/* When the text is inside the glider (Active), it turns Dark or Black */
-.toggle-option.active {
-  color: #000; /* Black text on White Glider */
-  text-shadow: 0 1px 0 rgba(255,255,255,0.5);
+.toggle-text.left {
+  left: 10px; /* Position of "3D" */
+}
+
+.toggle-text.right {
+  right: 10px; /* Position of "2D" */
+}
+
+/* When the class 'visible' is added, show the text */
+.toggle-text.visible {
+  opacity: 1;
+}
+
+/* 4. THE KNOB (Silver Circle) */
+.toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  
+  /* Silver Gradient */
+  background: linear-gradient(180deg, #ffffff 0%, #b0b0b0 100%);
+  
+  /* Knob Shadow */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  
+  /* Animation */
+  transition: transform 0.3s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+/* --- STATE: ACTIVE (3D MODE) --- */
+/* Move Knob to the Right */
+.toggle-knob.active {
+  transform: translateX(50px); /* Slides 50px to the right */
 }
