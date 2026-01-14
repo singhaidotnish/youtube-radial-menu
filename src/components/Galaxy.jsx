@@ -96,7 +96,7 @@ function Sun({ onReset }) {
             <Text 
                 position={[0, 0, 2.7]} 
                 fontSize={0.8} 
-                color="white" 
+                color="black" 
                 fontWeight="bold"
                 anchorX="center" 
                 anchorY="middle"
