@@ -1,4 +1,4 @@
-/* 1. POSITIONING & HOUSING (The "Double Oval") */
+/* 1. THE HOUSING (The Double Oval) */
 .toggle-housing {
   position: fixed;
   top: 20px;
@@ -6,81 +6,73 @@
   z-index: 10000;
   cursor: pointer;
   
-  /* Size of the whole widget */
+  /* Size */
   width: 90px;
   height: 40px;
   
-  /* --- THE DOUBLE OVAL EFFECT --- */
-  border-radius: 40px;
-  background: #000; /* Inner Track Color */
+  /* Black Background for the track */
+  background: #000000;
+  border-radius: 50px;
   
-  /* Layer 1: The Dark Grey Rim (Inner Border) */
+  /* --- THE DOUBLE RIM EFFECT --- */
+  /* Inner Border (Dark Grey) */
   border: 4px solid #1a1a1a; 
-  
-  /* Layer 2: The Outer Highlight (Outer Ring) */
+  /* Outer Glow/Ring (Lighter Grey to separate it from space) */
   box-shadow: 
-    0 0 0 1px #444, /* Thin outer grey line */
+    0 0 0 1px #444,             /* Thin outer definition line */
     0 4px 10px rgba(0,0,0,0.5); /* Drop shadow */
-    
-  overflow: hidden; /* Keeps content inside */
-  box-sizing: content-box; /* Ensures borders add to size */
+
+  position: relative; /* Container for absolute children */
+  box-sizing: content-box; /* Ensures border adds to width */
 }
 
-/* 2. THE TRACK (Holds the text) */
-.toggle-track {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-}
-
-/* 3. THE TEXT LABELS */
+/* 2. THE TEXT LABELS */
 .toggle-text {
   position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  
   font-family: sans-serif;
   font-weight: bold;
   font-size: 14px;
-  color: #fff;
-  transition: opacity 0.2s ease-in-out;
-  opacity: 0; /* Hidden by default */
-  pointer-events: none;
+  color: #ffffff; /* Bright White */
+  z-index: 1; /* Sits underneath the knob */
+  user-select: none;
 }
 
 .toggle-text.left {
-  left: 10px; /* Position of "3D" */
+  left: 14px; /* Position of "3D" */
 }
 
 .toggle-text.right {
-  right: 10px; /* Position of "2D" */
+  right: 14px; /* Position of "2D" */
 }
 
-/* When the class 'visible' is added, show the text */
-.toggle-text.visible {
-  opacity: 1;
-}
-
-/* 4. THE KNOB (Silver Circle) */
+/* 3. THE KNOB (Silver Circle) */
 .toggle-knob {
   position: absolute;
   top: 2px;
-  left: 2px;
+  left: 2px; /* STARTING POSITION (Left / 2D Mode) */
+  
   width: 36px;
   height: 36px;
   border-radius: 50%;
   
-  /* Silver Gradient */
+  /* Silver Metallic Gradient */
   background: linear-gradient(180deg, #ffffff 0%, #b0b0b0 100%);
   
-  /* Knob Shadow */
-  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  /* Shadow to pop off the background */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.8);
   
-  /* Animation */
-  transition: transform 0.3s cubic-bezier(0.5, 0, 0.2, 1);
+  /* Sits ON TOP of the text to cover it */
+  z-index: 2; 
+  
+  /* Smooth Slide Animation */
+  transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
 }
 
-/* --- STATE: ACTIVE (3D MODE) --- */
-/* Move Knob to the Right */
+/* --- ACTIVE STATE (3D Mode) --- */
+/* Slide Knob to the Right */
 .toggle-knob.active {
-  transform: translateX(50px); /* Slides 50px to the right */
+  transform: translateX(50px); 
 }
