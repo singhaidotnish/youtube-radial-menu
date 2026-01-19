@@ -163,3 +163,123 @@
   /* Offset it slightly from the cursor so it doesn't block visibility */
   transform: translate(15px, 15px);
 }
+
+
+/* --- ADD LINK UI STYLES --- */
+
+/* 1. Floating Action Button (Bottom Right) */
+.add-btn-container {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 200;
+}
+
+.add-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #333;
+  border: 2px solid #555;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  transition: all 0.2s;
+}
+
+.add-btn:hover {
+  background: #ffaa00;
+  border-color: #ffaa00;
+  color: black;
+  transform: scale(1.1);
+}
+
+/* 2. The Input Modal */
+.add-modal {
+  position: fixed;
+  bottom: 90px;
+  right: 30px;
+  width: 250px;
+  background: rgba(20, 20, 20, 0.95);
+  border: 1px solid #444;
+  border-radius: 12px;
+  padding: 20px;
+  z-index: 200;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  color: white;
+  font-family: sans-serif;
+}
+
+.add-modal h3 {
+  margin: 0 0 15px 0;
+  font-size: 16px;
+  color: #ffaa00;
+}
+
+.add-modal input {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  box-sizing: border-box; /* Fixes padding issues */
+}
+
+.add-modal input:focus {
+  outline: none;
+  border-color: #ffaa00;
+}
+
+.save-btn {
+  flex: 1;
+  padding: 8px;
+  background: #ffaa00;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  color: black;
+}
+
+.reset-btn {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid #555;
+  border-radius: 6px;
+  color: #888;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.reset-btn:hover {
+  border-color: #ff4444;
+  color: #ff4444;
+}
+
+/* Styling for the new Location Dropdown */
+.select-wrapper {
+  margin-bottom: 10px;
+}
+
+.location-select {
+  width: 100%;
+  padding: 8px;
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.location-select:focus {
+  outline: none;
+  border-color: #ffaa00;
+}
