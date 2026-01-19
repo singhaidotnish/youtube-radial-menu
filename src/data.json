@@ -49,9 +49,9 @@
     "label": "Trading",
     "icon": "trending",
     "children": [
-      { "icon": "trending", "url": "https://tradingview.com", "label": "TradingView" },
-      { "icon": "dollar", "url": "https://zerodha.com", "label": "Zerodha" },
-      { "icon": "activity", "url": "https://sensibull.com", "label": "Sensibull" }
+      { "icon": "scanners", "url": "https://beta.streak.tech/", "label": "Streak" },
+      { "icon": "trading", "url": "https://zerodha.com", "label": "Zerodha" },
+      { "icon": "paper trades", "url": "https://sensibull.com", "label": "Sensibull" }
     ]
   },
   {
