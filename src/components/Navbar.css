@@ -1,32 +1,43 @@
 .navbar-container {
   position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 20000; /* Highest layer to ensure it's clickable */
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full width */
+  height: 80px; /* ample height for buttons */
+  z-index: 20000;
   
   display: flex;
+  justify-content: space-between; /* Pushes children to far Left and far Right */
   align-items: center;
-  gap: 15px; /* Space between Plus button and Switch */
-  
-  background: rgba(0, 0, 0, 0.6); /* Optional: subtle backdrop */
-  padding: 10px 15px;
-  border-radius: 50px;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0 40px; /* Distance from edges */
+  box-sizing: border-box;
+
+  /* Visual "Line" effect (Optional: subtle gradient at top) */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Very faint line */
+
+  /* CRITICAL: Allows clicks to pass through the empty space to the 3D canvas */
+  pointer-events: none; 
+}
+
+/* Re-enable clicking for the actual buttons */
+.nav-add-btn, .switch-wrapper {
+  pointer-events: auto; 
 }
 
 /* The Plus Button Style */
 .nav-add-btn {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   border-radius: 50%;
-  background: #333;
+  background: #222;
   border: 1px solid #555;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .nav-add-btn:hover {
@@ -35,13 +46,13 @@
   transform: scale(1.1);
 }
 
-.nav-add-btn:hover svg {
-  stroke: black; /* Turn icon black on hover */
+.nav-add-btn:active {
+  transform: scale(0.95);
 }
 
-/* Ensure the switch fits nicely */
+/* Wrapper for switch to ensure it sits correctly in flexbox */
 .switch-wrapper {
   position: relative;
-  /* We reset the fixed positioning of the toggle switch itself 
-     so it flows inside this flex container */
+  display: flex;
+  align-items: center;
 }
