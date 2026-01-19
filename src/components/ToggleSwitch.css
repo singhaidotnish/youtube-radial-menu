@@ -1,10 +1,15 @@
-/* 1. CONTAINER: Positioning & Background */
+/* src/components/ToggleSwitch.css */
+
+/* 1. CONTAINER: The main shell of the switch */
 .toggle-container {
-  /* --- POSITIONING FIX --- */
-  position: fixed;
-  top: 30px;  /* Distance from top */
-  left: 30px; /* Distance from left (Moved to Top-Left) */
-  z-index: 10001; /* High number ensures it's clearly visible on top of stars */
+  /* IMPORTANT: Changed from 'fixed' to 'relative' so it sits inside the Navbar */
+  position: relative; 
+  
+  /* Remove top/left coordinates because the Navbar controls the position now */
+  /* top: 30px;  <-- REMOVED */
+  /* left: 30px; <-- REMOVED */
+  
+  z-index: 1; /* Local stacking context */
   
   /* Size & Shape */
   width: 100px;
@@ -12,44 +17,41 @@
   background: #000000; /* Pure black background */
   border-radius: 40px; /* Capsule shape */
   
-  /* Outer Border (The "Housing") */
+  /* Outer Border */
   border: 2px solid #333; 
-  box-shadow: 0 4px 15px rgba(0,0,0,0.8); /* Drop shadow for depth */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.8); /* Drop shadow */
   
   cursor: pointer;
-  overflow: hidden; /* Keeps the moving ring inside the capsule */
+  overflow: hidden; /* Keeps the moving ring inside */
 }
 
 /* 2. THE MOVING RING (The "Oval") */
 .toggle-ring {
   position: absolute;
-  top: 4px; /* Spacing from top edge */
-  left: 4px; /* Starting position inside the capsule */
+  top: 4px; 
+  left: 4px; 
   
-  width: 44px; /* Almost half the width (leaving space for gaps) */
-  height: 28px; /* Slightly smaller than container height */
+  width: 44px; 
+  height: 28px; 
   border-radius: 20px;
   
-  /* --- THE RING STYLE --- */
-  /* Transparent center, but with a glowing border */
+  /* Ring Style */
   background: transparent; 
-  border: 2px solid #ffaa00; /* Orange Border (Matches your "Start" button) */
+  border: 2px solid #ffaa00; /* Orange Border */
   box-shadow: 0 0 8px rgba(255, 170, 0, 0.5); /* Orange Glow */
   
-  /* Animation Physics */
+  /* Animation */
   transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-  z-index: 1; /* Sits BEHIND the text */
+  z-index: 1; 
 }
 
 /* 3. RING POSITIONS */
-/* 3D Mode: Ring moves to Left */
 .pos-left {
   transform: translateX(0px); 
 }
 
-/* 2D Mode: Ring moves to Right */
 .pos-right {
-  transform: translateX(48px); /* Slides 48px to the right */
+  transform: translateX(48px); 
 }
 
 /* 4. TEXT CONTAINER */
@@ -61,11 +63,11 @@
   height: 100%;
   
   display: flex;
-  justify-content: space-between; /* Spreads text to left and right */
-  align-items: center; /* Centers text vertically */
-  padding: 0 16px; /* Space from edges */
+  justify-content: space-between;
+  align-items: center; 
+  padding: 0 16px; 
   box-sizing: border-box;
-  z-index: 2; /* Text sits ON TOP of the ring */
+  z-index: 2; 
 }
 
 /* 5. TEXT STYLING */
@@ -73,13 +75,12 @@
   font-family: sans-serif;
   font-weight: bold;
   font-size: 14px;
-  color: #555; /* Default Dark Grey (Inactive) */
+  color: #555; 
   transition: color 0.3s;
   user-select: none;
 }
 
-/* ACTIVE TEXT (When the Ring is under it) */
 .toggle-text.active {
-  color: #ffffff; /* Turns White */
-  text-shadow: 0 0 5px rgba(255,255,255,0.8); /* Slight glow */
+  color: #ffffff; 
+  text-shadow: 0 0 5px rgba(255,255,255,0.8); 
 }

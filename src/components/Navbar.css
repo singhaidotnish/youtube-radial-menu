@@ -1,0 +1,47 @@
+.navbar-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 20000; /* Highest layer to ensure it's clickable */
+  
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Space between Plus button and Switch */
+  
+  background: rgba(0, 0, 0, 0.6); /* Optional: subtle backdrop */
+  padding: 10px 15px;
+  border-radius: 50px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* The Plus Button Style */
+.nav-add-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #333;
+  border: 1px solid #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.nav-add-btn:hover {
+  background: #ffaa00;
+  border-color: #ffaa00;
+  transform: scale(1.1);
+}
+
+.nav-add-btn:hover svg {
+  stroke: black; /* Turn icon black on hover */
+}
+
+/* Ensure the switch fits nicely */
+.switch-wrapper {
+  position: relative;
+  /* We reset the fixed positioning of the toggle switch itself 
+     so it flows inside this flex container */
+}

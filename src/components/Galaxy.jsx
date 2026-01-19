@@ -109,7 +109,7 @@ function Sun({ onReset }) {
 
 // --- MAIN EXPORT ---
 // We accept a prop 'showSolarSystem' to control visibility
-export default function Galaxy({ showSolarSystem }) {
+export default function Galaxy({ showSolarSystem, items }) {
   const [activeId, setActiveId] = useState(null);
 
   return (

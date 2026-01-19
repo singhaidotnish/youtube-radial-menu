@@ -29,7 +29,7 @@ const getSectorPath = (outerRadius, innerRadius, startAngle, endAngle) => {
   ].join(" ");
 };
 
-const RadialMenu = () => {
+const RadialMenu = ({items}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, text: '' });
