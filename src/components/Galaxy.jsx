@@ -5,15 +5,15 @@ import * as THREE from 'three';
 
 // 1. USE LOCAL TEXTURES (Stable & Fast)
 const TEXTURE_PATHS = [
-    "/textures/one.jpg",
-    "/textures/02.png",
-    "/textures/03.jpeg",
-    "/textures/04.jpg",
-    "/textures/05.jpg",
-    "/textures/06.jpg",
-    "/textures/07.jpg",
-    "/textures/08.jpg",
-    "/textures/09.jpeg"
+    "/public/textures/one.jpg",
+    "/public/textures/02.png",
+    "/public/textures/03.jpeg",
+    "/public/textures/04.jpg",
+    "/public/textures/05.jpg",
+    "/public/textures/06.jpg",
+    "/public/textures/07.jpg",
+    "/public/textures/08.jpg",
+    "/public/textures/09.jpeg"
 ];
 
 function Sun({ onReset }) {
