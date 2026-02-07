@@ -18,7 +18,7 @@ function Moon({ item, index, total, radius }) {
   const z = radius * Math.sin(angle);
   const imgUrl = item.img ? item.img : fallbackImg;
   const texture = useLoader(THREE.TextureLoader, imgUrl);
-  useFrame((state, delta) => { meshRef.current.rotation.y += delta * 1; });
+  // useFrame((state, delta) => { meshRef.current.rotation.y += delta * 1; });
   return (
     <group position={[x, 0, z]}>
       <Float speed={4} rotationIntensity={1} floatIntensity={1}>
@@ -40,10 +40,10 @@ function Planet({ item, index, total, radius, isActive, onClick }) {
   const z = radius * Math.sin(angle);
   const imgUrl = item.img ? item.img : fallbackImg;
   const texture = useLoader(THREE.TextureLoader, imgUrl);
-  useFrame((state, delta) => {
-    if(meshRef.current) meshRef.current.rotation.y += delta * 0.5;
-    if (isActive && groupRef.current) groupRef.current.rotation.y += delta * 0.1;
-  });
+  // useFrame((state, delta) => {
+  //   if(meshRef.current) meshRef.current.rotation.y += delta * 0.5;
+  //   if (isActive && groupRef.current) groupRef.current.rotation.y += delta * 0.1;
+  // });
   return (
     <group position={[x, 0, z]}>
       <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
@@ -72,7 +72,7 @@ function Sun({ onReset }) {
     const sunRef = useRef();
     
     // Rotate the text and sun together
-    useFrame((state, delta) => (sunRef.current.rotation.y += delta * 0.2));
+    // useFrame((state, delta) => (sunRef.current.rotation.y += delta * 0.2));
 
     return (
         <group onClick={onReset} ref={sunRef}>
