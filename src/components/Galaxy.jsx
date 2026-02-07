@@ -1,14 +1,20 @@
-import React, { useRef, useMemo, useState, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import React, { useRef, useState, Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { Stars, Text, Html, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 
-// 1. THE SUN (Center "Start" Button)
+// --- 1. THE TEXTURE PLAYLIST ---
+// We cycle through these. Add as many valid URLs as you want here.
+const TEXTURE_URLS = [
+    "https://raw.githubusercontent.com/pmndrs/drei-assets/master/mars/mars_1k.jpg",             // 1. Red/Mars
+    "https://raw.githubusercontent.com/pmndrs/drei-assets/master/earth/earth_daymap_1k.jpg",    // 2. Blue/Earth
+    "https://raw.githubusercontent.com/pmndrs/drei-assets/master/moon/moon_1k.jpg",             // 3. Grey/Moon
+    "https://raw.githubusercontent.com/pmndrs/drei-assets/master/venus/venus_atmosphere_1k.jpg", // 4. Yellow/Venus
+    "https://upload.wikimedia.org/wikipedia/commons/c/c1/Jupiter_New_Horizons.jpg"               // 5. Brown/Jupiter (High Res)
+];
+
 function Sun({ onReset }) {
     const sunRef = useRef();
-
-    // Note: Rotation removed as requested
-    // useFrame((state, delta) => (sunRef.current.rotation.y += delta * 0.2));
 
     return (
         <group onClick={onReset} ref={sunRef}>
@@ -38,29 +44,22 @@ function Sun({ onReset }) {
     )
 }
 
-// 2. THE TEXTURED PLANET
 function Planet({ item, index, total, radiusX, radiusZ }) {
     const meshRef = useRef();
     const groupRef = useRef();
     const [hovered, setHover] = useState(false);
 
-    // --- LOAD TEXTURE ---
-    // This loads a rocky moon texture. You can replace this URL with:
-    // 1. Another URL
-    // 2. A local file (e.g., "/textures/mars.jpg") inside your public folder
-    // const texture = useTexture("https://raw.githubusercontent.com/pmndrs/drei-assets/master/moon/moon_1k.jpg");
-    const texture = useTexture("/textures/myplanet.jpg");
+    // --- 2. SELECT UNIQUE TEXTURE ---
+    // The '%' (modulo) operator ensures we loop back to the start if we have more planets than textures.
+    const textureUrl = TEXTURE_URLS[index % TEXTURE_URLS.length];
+    
+    // Load the specific texture for THIS planet
+    const texture = useTexture(textureUrl);
+
     // Calculate position
     const angle = (index / total) * Math.PI * 2;
     const x = Math.cos(angle) * radiusX;
     const z = Math.sin(angle) * radiusZ;
-
-    // Note: Rotation removed as requested
-    /* useFrame((state, delta) => {
-      if(meshRef.current) meshRef.current.rotation.y += delta * 0.5;
-      if (groupRef.current) groupRef.current.rotation.y += delta * 0.1;
-    });
-    */
 
     return (
         <group ref={groupRef} position={[x, 0, z]}>
@@ -70,12 +69,12 @@ function Planet({ item, index, total, radiusX, radiusZ }) {
                 onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
                 onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             >
+                {/* Slightly random size for variety (between 1.0 and 1.4) */}
                 <sphereGeometry args={[1.2, 32, 32]} />
                 
-                {/* TEXTURE APPLIED HERE */}
                 <meshStandardMaterial 
                     map={texture} 
-                    color={hovered ? '#ffaa00' : 'white'} // Highlights orange on hover
+                    color={hovered ? '#ffaa00' : 'white'} 
                     roughness={0.8}
                 />
             </mesh>
@@ -88,7 +87,7 @@ function Planet({ item, index, total, radiusX, radiusZ }) {
                     fontWeight: 'bold', 
                     whiteSpace: 'nowrap',
                     textShadow: '0 2px 4px black',
-                    transition: 'color 0.2s'
+                    pointerEvents: 'none' 
                 }}>
                     {item.label}
                 </div>
@@ -97,9 +96,7 @@ function Planet({ item, index, total, radiusX, radiusZ }) {
     );
 }
 
-// 3. MAIN GALAXY COMPONENT
 export default function Galaxy({ showSolarSystem, items }) {
-    // If not in 3D mode, render nothing (saves performance)
     if (!showSolarSystem) return null;
 
     return (
@@ -109,12 +106,10 @@ export default function Galaxy({ showSolarSystem, items }) {
         }}>
             <Canvas camera={{ position: [0, 20, 25], fov: 45 }}>
                 
-                {/* Lighting is crucial for textures to be visible */}
                 <ambientLight intensity={0.3} />
                 <pointLight position={[0, 0, 0]} intensity={250} color="#ffaa00" distance={50} decay={2} />
                 <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 
-                {/* SUSPENSE WRAPPER (Required for loading textures) */}
                 <Suspense fallback={null}>
                     <Sun onReset={() => console.log("Reset")} />
                     
