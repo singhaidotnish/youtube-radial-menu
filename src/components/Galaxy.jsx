@@ -1,6 +1,6 @@
 import React, { useRef, useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Stars, Text, Html, useTexture } from '@react-three/drei';
+import { Stars, Text, Html, useTexture, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
 // 1. USE LOCAL TEXTURES (Stable & Fast)
