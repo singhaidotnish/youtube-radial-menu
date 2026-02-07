@@ -113,6 +113,12 @@ export default function Galaxy({ showSolarSystem, items }) {
                 <pointLight position={[0, 0, 0]} intensity={250} color="#ffaa00" distance={50} decay={2} />
                 <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 
+                <OrbitControls 
+                    enableZoom={true} 
+                    enablePan={true} 
+                    enableRotate={true} 
+                />
+
                 {/* Suspense handles the loading. If a texture is missing, it waits. */}
                 <Suspense fallback={null}>
                     <Sun onReset={() => console.log("Reset")} />
