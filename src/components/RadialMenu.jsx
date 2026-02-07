@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link as LinkIcon, Plus, X, Folder } from "lucide-react"; 
+import { 
+  Link as LinkIcon, Code, TrendingUp, Activity, Sun, DollarSign, 
+  Heart, User, Utensils, MessageCircle, HelpCircle, Bot, Search, 
+  Mic, Video, Image, Brain, Building, Cloud, Server
+} from "lucide-react";
 import "./RadialMenu.css";
-import initialData from '../data.json'; 
 
 // --- MATH HELPERS ---
 const polarToCartesian = (radius, angleInDegrees) => {
@@ -29,67 +32,38 @@ const getSectorPath = (outerRadius, innerRadius, startAngle, endAngle) => {
   ].join(" ");
 };
 
-const RadialMenu = ({items}) => {
+// --- ICON MAP ---
+const ICON_MAP = {
+  youtube: <Video size={24} />,
+  activity: <Activity size={20} />,
+  sun: <Sun size={20} />,
+  trending: <TrendingUp size={20} />,
+  dollar: <DollarSign size={20} />,
+  heart: <Heart size={20} />,
+  user: <User size={20} />,
+  code: <Code size={20} />,
+  utensils: <Utensils size={20} />,
+  message: <MessageCircle size={20} />,
+  help: <HelpCircle size={20} />,
+  bot: <Bot size={20} />,
+  search: <Search size={20} />,
+  mic: <Mic size={20} />,
+  video: <Video size={20} />,
+  image: <Image size={20} />,
+  brain: <Brain size={20} />,
+  building: <Building size={20} />,
+  cloud: <Cloud size={20} />,
+  server: <Server size={20} />,
+  link: <LinkIcon size={20} />
+};
+
+// --- MAIN COMPONENT ---
+// We now accept 'items' as a prop from App.jsx
+const RadialMenu = ({ items }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState(null);
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, text: '' });
   
-  // 1. DATA STATE
-  const [items, setItems] = useState(() => {
-    const saved = localStorage.getItem('radialMenuItems');
-    return saved ? JSON.parse(saved) : initialData;
-  });
-
-  // 2. ADD MODAL STATE
-  const [isAdding, setIsAdding] = useState(false);
-  // We now track 'parentId' to know WHERE to put the link
-  const [newItem, setNewItem] = useState({ label: '', url: '', parentId: 'root' });
-
-  // --- LOGIC: SAVE ITEM ---
-  const handleAddItem = (e) => {
-    e.preventDefault();
-    if (!newItem.label) return;
-
-    const newLinkObject = {
-      id: Date.now(),
-      label: newItem.label,
-      url: newItem.url || "#", // If empty, it's just a folder
-      icon: "link",
-      img: null,
-      children: newItem.url ? null : [] // If no URL provided, treat as a "New Group"
-    };
-
-    let updatedItems = [...items];
-
-    if (newItem.parentId === 'root') {
-      // Option A: Add to Main Circle
-      updatedItems.push(newLinkObject);
-    } else {
-      // Option B: Add to an Existing Group
-      updatedItems = updatedItems.map(item => {
-        if (item.id === parseInt(newItem.parentId)) {
-          // Found the parent! Add to its children.
-          const currentChildren = item.children || [];
-          return { ...item, children: [...currentChildren, newLinkObject] };
-        }
-        return item;
-      });
-    }
-
-    setItems(updatedItems);
-    localStorage.setItem('radialMenuItems', JSON.stringify(updatedItems));
-    
-    setNewItem({ label: '', url: '', parentId: 'root' });
-    setIsAdding(false);
-  };
-
-  const handleReset = () => {
-    if(confirm("Reset menu to default?")) {
-      setItems(initialData);
-      localStorage.removeItem('radialMenuItems');
-    }
-  };
-
   // CONFIGURATION
   const GAP = 2; 
   const R1_INNER = 60;
@@ -105,12 +79,18 @@ const RadialMenu = ({items}) => {
     setActiveGroup(activeGroup === groupId ? null : groupId);
   };
 
+  // --- MOUSE HANDLERS ---
   const handleMouseEnter = (e, text) => {
     setTooltip({ show: true, x: e.clientX, y: e.clientY, text });
   };
-  const handleMouseMove = (e) => setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
-  const handleMouseLeave = () => setTooltip(prev => ({ ...prev, show: false }));
+  const handleMouseMove = (e) => {
+    setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
+  };
+  const handleMouseLeave = () => {
+    setTooltip(prev => ({ ...prev, show: false }));
+  };
 
+  // --- RENDER SLICE ---
   const renderSlice = (item, index, total, innerR, outerR, isGroupParent) => {
     const sliceAngle = 360 / total;
     const startAngle = (index * sliceAngle) + (GAP / 2);
@@ -147,7 +127,7 @@ const RadialMenu = ({items}) => {
           />
           {!item.img && (
             <foreignObject x={pos.x - 14} y={pos.y - 14} width="28" height="28" style={{ color: isActive ? "black" : "#ddd", pointerEvents: "none" }}>
-              <div className="slice-icon"><LinkIcon size={20} /></div>
+              <div className="slice-icon">{ICON_MAP[item.icon] || <LinkIcon size={20} />}</div>
             </foreignObject>
           )}
         </a>
@@ -164,7 +144,9 @@ const RadialMenu = ({items}) => {
       </AnimatePresence>
 
       <div className="menu-container">
-        <motion.button className="trigger-btn" onClick={toggleMenu} whileTap={{ scale: 0.95 }}>START</motion.button>
+        <motion.button className="trigger-btn" onClick={toggleMenu} whileTap={{ scale: 0.95 }}>
+           START
+        </motion.button>
 
         <AnimatePresence>
           {isOpen && (
@@ -189,70 +171,11 @@ const RadialMenu = ({items}) => {
         </AnimatePresence>
       </div>
 
-      {/* ADD BUTTON */}
-      <div className="add-btn-container">
-        <button className="add-btn" onClick={() => setIsAdding(!isAdding)}>
-            {isAdding ? <X size={24} /> : <Plus size={24} />}
-        </button>
-      </div>
-
-      {/* --- INTELLIGENT ADD MODAL --- */}
-      <AnimatePresence>
-        {isAdding && (
-            <motion.div 
-                className="add-modal"
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: 50, opacity: 0 }}
-            >
-                <h3>Add to Menu</h3>
-                <form onSubmit={handleAddItem}>
-                    {/* 1. LABEL */}
-                    <input 
-                        type="text" 
-                        placeholder="Label (e.g. My Blog)" 
-                        value={newItem.label}
-                        onChange={(e) => setNewItem({...newItem, label: e.target.value})}
-                        autoFocus
-                        required
-                    />
-                    
-                    {/* 2. URL (Optional) */}
-                    <input 
-                        type="url" 
-                        placeholder="URL (leave empty for folder)" 
-                        value={newItem.url}
-                        onChange={(e) => setNewItem({...newItem, url: e.target.value})}
-                    />
-
-                    {/* 3. LOCATION SELECTOR */}
-                    <div className="select-wrapper">
-                      <label style={{fontSize: '12px', color: '#888', marginBottom: '4px', display:'block'}}>Location:</label>
-                      <select 
-                        value={newItem.parentId} 
-                        onChange={(e) => setNewItem({...newItem, parentId: e.target.value})}
-                        className="location-select"
-                      >
-                        <option value="root">🔵 Main Circle (New Top Item)</option>
-                        {/* Dynamically list all existing groups that have children */}
-                        {items.map(item => (
-                          // Only show items that are "Folders" (have children or no URL)
-                          (item.children || !item.url) && 
-                          <option key={item.id} value={item.id}>📂 Inside: {item.label}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-                        <button type="submit" className="save-btn">Save</button>
-                        <button type="button" className="reset-btn" onClick={handleReset}>Reset</button>
-                    </div>
-                </form>
-            </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* TOOLTIP */}
       {tooltip.show && <div className="radial-tooltip" style={{ top: tooltip.y, left: tooltip.x }}>{tooltip.text}</div>}
+      
+      {/* NOTE: The 'Add' Modal and Button have been removed from here 
+          because they now live in App.jsx and Navbar.jsx */}
     </div>
   );
 };
