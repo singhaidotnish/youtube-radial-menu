@@ -48,8 +48,8 @@ function Planet({ item, index, total, radiusX, radiusZ }) {
     // This loads a rocky moon texture. You can replace this URL with:
     // 1. Another URL
     // 2. A local file (e.g., "/textures/mars.jpg") inside your public folder
-    const texture = useTexture("https://raw.githubusercontent.com/pmndrs/drei-assets/master/moon/moon_1k.jpg");
-
+    // const texture = useTexture("https://raw.githubusercontent.com/pmndrs/drei-assets/master/moon/moon_1k.jpg");
+    const texture = useTexture("/textures/myplanet.jpg");
     // Calculate position
     const angle = (index / total) * Math.PI * 2;
     const x = Math.cos(angle) * radiusX;
