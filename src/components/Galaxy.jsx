@@ -79,18 +79,24 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
             
             // inside function Planet(...)
 
-            <Html position={[0, isChild ? -1.2 : -2.2, 0]} center distanceFactor={10} style={{ pointerEvents: 'none' }}>
+            <Html 
+                position={[0, isChild ? -1.5 : -2.5, 0]} // Moved lower to fit big text
+                center 
+                distanceFactor={10} 
+                style={{ pointerEvents: 'none' }}
+            >
                 <div style={{ 
                     color: hovered ? '#ffaa00' : 'white', 
                     
-                    /* --- CHANGE THIS LINE --- */
-                    fontSize: isChild ? '24px' : '24px',  // Was '10px' : '14px'
+                    /* --- BIG TEXT SETTINGS --- */
+                    fontSize: isChild ? '18px' : '30px', // Much bigger now
                     
-                    fontWeight: 'bold', 
+                    fontWeight: '900', // Extra Bold
                     whiteSpace: 'nowrap',
-                    textShadow: '0 2px 4px black',
+                    textShadow: '0 4px 8px black', // Stronger shadow for readability
                     userSelect: 'none',
-                    fontFamily: 'sans-serif' // Ensures clean look
+                    fontFamily: 'sans-serif',
+                    letterSpacing: '1px'
                 }}>
                     {item.label}
                 </div>
