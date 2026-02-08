@@ -77,14 +77,20 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                 />
             </mesh>
             
-            <Html position={[0, isChild ? -1.0 : -1.8, 0]} center distanceFactor={10} style={{ pointerEvents: 'none' }}>
+            // inside function Planet(...)
+
+            <Html position={[0, isChild ? -1.2 : -2.2, 0]} center distanceFactor={10} style={{ pointerEvents: 'none' }}>
                 <div style={{ 
                     color: hovered ? '#ffaa00' : 'white', 
-                    fontSize: isChild ? '10px' : '14px', 
+                    
+                    /* --- CHANGE THIS LINE --- */
+                    fontSize: isChild ? '16px' : '24px',  // Was '10px' : '14px'
+                    
                     fontWeight: 'bold', 
                     whiteSpace: 'nowrap',
                     textShadow: '0 2px 4px black',
-                    userSelect: 'none'
+                    userSelect: 'none',
+                    fontFamily: 'sans-serif' // Ensures clean look
                 }}>
                     {item.label}
                 </div>
