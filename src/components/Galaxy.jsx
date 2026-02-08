@@ -84,7 +84,7 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                     color: hovered ? '#ffaa00' : 'white', 
                     
                     /* --- CHANGE THIS LINE --- */
-                    fontSize: isChild ? '16px' : '24px',  // Was '10px' : '14px'
+                    fontSize: isChild ? '24px' : '24px',  // Was '10px' : '14px'
                     
                     fontWeight: 'bold', 
                     whiteSpace: 'nowrap',
