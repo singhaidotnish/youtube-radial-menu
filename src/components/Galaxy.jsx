@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Stars, Text, Html, useTexture, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-// 1. TEXTURE PATHS (Using your correct GitHub repo paths)
+// 1. TEXTURE PATHS
 const TEXTURE_PATHS = [
     "/youtube-radial-menu/textures/one.jpg",
     "/youtube-radial-menu/textures/02.png",
@@ -40,11 +40,10 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     const groupRef = useRef();
     const [hovered, setHover] = useState(false);
 
-    // Texture Logic: Children reuse the parent's texture list logic
     const texturePath = TEXTURE_PATHS[index % TEXTURE_PATHS.length];
     const texture = useTexture(texturePath);
 
-    // Calculate position around the circle
+    // Calculate position
     const angle = (index / total) * Math.PI * 2;
     const x = Math.cos(angle) * radiusX;
     const z = Math.sin(angle) * radiusZ;
@@ -52,25 +51,25 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     return (
         <group ref={groupRef} position={[x, 0, z]}>
             
-            {/* Dashed Orbit Line (Only for the outer ring/children) */}
+            {/* Dashed Orbit Line (Only for children) */}
             {isChild && (
                  <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-x, 0, -z]}>
-                    <ringGeometry args={[radiusX - 0.05, radiusX + 0.05, 64]} />
-                    <meshBasicMaterial color="#444" transparent opacity={0.2} side={THREE.DoubleSide} />
+                    <ringGeometry args={[radiusX - 0.05, radiusX + 0.05, 32]} />
+                    <meshBasicMaterial color="#444" transparent opacity={0.4} side={THREE.DoubleSide} />
                 </mesh>
             )}
 
             <mesh 
                 ref={meshRef}
                 onClick={(e) => {
-                    e.stopPropagation(); // Stop click from hitting background
+                    e.stopPropagation(); 
                     onClick(item);
                 }}
                 onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
                 onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             >
-                {/* Child planets are slightly smaller (0.8) */}
-                <sphereGeometry args={[isChild ? 0.8 : 1.2, 32, 32]} />
+                {/* Child planets are much smaller (0.6) */}
+                <sphereGeometry args={[isChild ? 0.6 : 1.2, 32, 32]} />
                 <meshStandardMaterial 
                     map={texture} 
                     color={hovered ? '#ffaa00' : 'white'} 
@@ -78,11 +77,10 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                 />
             </mesh>
             
-            {/* Label */}
-            <Html position={[0, isChild ? -1.4 : -1.8, 0]} center distanceFactor={10} style={{ pointerEvents: 'none' }}>
+            <Html position={[0, isChild ? -1.0 : -1.8, 0]} center distanceFactor={10} style={{ pointerEvents: 'none' }}>
                 <div style={{ 
                     color: hovered ? '#ffaa00' : 'white', 
-                    fontSize: isChild ? '12px' : '14px', 
+                    fontSize: isChild ? '10px' : '14px', 
                     fontWeight: 'bold', 
                     whiteSpace: 'nowrap',
                     textShadow: '0 2px 4px black',
@@ -96,24 +94,33 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
 }
 
 export default function Galaxy({ showSolarSystem, items }) {
-    // STATE: Tracks which folder is open (e.g., 'ai' or null)
     const [activeGroupId, setActiveGroupId] = useState(null);
 
     if (!showSolarSystem) return null;
 
-    // --- LOGIC: HANDLE CLICKS ---
     const handlePlanetClick = (item) => {
         if (item.children && item.children.length > 0) {
-            // It IS a Folder -> Toggle the "Outer Ring"
             setActiveGroupId(activeGroupId === item.id ? null : item.id);
         } else if (item.url) {
-            // It IS a Link -> Open it
             window.open(item.url, '_blank');
         }
     };
 
-    // Find the actual data object for the active group
     const activeGroup = items.find(i => i.id === activeGroupId);
+    
+    // --- CALCULATE PARENT POSITION ---
+    // If a group is active, we need to know WHERE it is to put the children around it.
+    let parentPosition = [0, 0, 0];
+    if (activeGroup) {
+        const parentIndex = items.findIndex(i => i.id === activeGroupId);
+        const parentAngle = (parentIndex / items.length) * Math.PI * 2;
+        // MUST match the radiusX/Z of the main planets (12)
+        parentPosition = [
+            Math.cos(parentAngle) * 12,
+            0,
+            Math.sin(parentAngle) * 12
+        ];
+    }
 
     return (
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, background: 'black' }}>
@@ -125,10 +132,9 @@ export default function Galaxy({ showSolarSystem, items }) {
                 <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
 
                 <Suspense fallback={null}>
-                    {/* SUN: Clicking Reset closes any open folder */}
                     <Sun onReset={() => setActiveGroupId(null)} />
                     
-                    {/* 1. INNER RING (Main Categories like "AI Tools") */}
+                    {/* 1. INNER RING (Main Planets) */}
                     {items.map((item, index) => (
                         <Planet 
                             key={item.id || index}
@@ -142,19 +148,24 @@ export default function Galaxy({ showSolarSystem, items }) {
                         />
                     ))}
 
-                    {/* 2. OUTER RING (Sub-items like "ChatGPT", "Gemini") */}
-                    {activeGroup && activeGroup.children && activeGroup.children.map((child, index) => (
-                        <Planet 
-                            key={child.id || index}
-                            item={child} 
-                            index={index} 
-                            total={activeGroup.children.length} 
-                            radiusX={20} // Larger orbit for satellites
-                            radiusZ={20} 
-                            onClick={handlePlanetClick}
-                            isChild={true}
-                        />
-                    ))}
+                    {/* 2. SATELLITES (Children of Active Group) */}
+                    {activeGroup && activeGroup.children && (
+                        // We shift this entire group to the Parent's [x, 0, z] coordinates
+                        <group position={parentPosition}>
+                            {activeGroup.children.map((child, index) => (
+                                <Planet 
+                                    key={child.id || index}
+                                    item={child} 
+                                    index={index} 
+                                    total={activeGroup.children.length} 
+                                    radiusX={4}  // Small radius (orbiting the parent)
+                                    radiusZ={4} 
+                                    onClick={handlePlanetClick}
+                                    isChild={true}
+                                />
+                            ))}
+                        </group>
+                    )}
                 </Suspense>
             </Canvas>
         </div>
