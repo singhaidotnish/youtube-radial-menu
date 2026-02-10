@@ -40,8 +40,13 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     const groupRef = useRef();
     const [hovered, setHover] = useState(false);
 
+    // --- LOGIC UPDATE: PRIORITY TEXTURES ---
+    // 1. If the JSON item has an 'img', use it.
+    // 2. Otherwise, fall back to the random planet list.
     const textureToLoad = item.img || TEXTURE_PATHS[index % TEXTURE_PATHS.length];
-    const texture = useTexture(texturePath);
+    
+    // Load the decided texture
+    const texture = useTexture(textureToLoad);
 
     // Calculate position
     const angle = (index / total) * Math.PI * 2;
@@ -68,7 +73,7 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                 onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
                 onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             >
-                {/* Child planets are much smaller (0.6) */}
+                {/* Sphere */}
                 <sphereGeometry args={[isChild ? 0.6 : 1.2, 32, 32]} />
                 <meshStandardMaterial 
                     map={texture} 
@@ -77,23 +82,18 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                 />
             </mesh>
             
-            // inside function Planet(...)
-
             <Html 
-                position={[0, isChild ? -1.5 : -2.5, 0]} // Moved lower to fit big text
+                position={[0, isChild ? -1.5 : -2.5, 0]} 
                 center 
                 distanceFactor={10} 
                 style={{ pointerEvents: 'none' }}
             >
                 <div style={{ 
                     color: hovered ? '#ffaa00' : 'white', 
-                    
-                    /* --- BIG TEXT SETTINGS --- */
-                    fontSize: isChild ? '18px' : '30px', // Much bigger now
-                    
-                    fontWeight: '900', // Extra Bold
+                    fontSize: isChild ? '18px' : '30px',
+                    fontWeight: '900', 
                     whiteSpace: 'nowrap',
-                    textShadow: '0 4px 8px black', // Stronger shadow for readability
+                    textShadow: '0 4px 8px black',
                     userSelect: 'none',
                     fontFamily: 'sans-serif',
                     letterSpacing: '1px'
