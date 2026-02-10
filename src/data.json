@@ -55,27 +55,32 @@
     ]
   },
   {
-    "id": "nmmc",
-    "label": "NMMC",
-    "icon": "building",
-    "url": "https://www.nmmc.gov.in/"
+    "id": "utilites",
+    "label": "Utilities",
+    "icon": "wrench",
+    "children": [
+      { "icon": "nmmc", "url": "https://www.nmmc.gov.in/", "label": "NMMC" },
+      { "icon": "paypal", "url": "https://www.paypal.com/in/home", "label": "Paypal" },
+      { "icon": "github", "url": "https://github.com", "label": "GitHub" },
+      { "icon": "linkedin", "url": "https://www.linkedin.com", "label": "LinkedIn" },
+      { "icon": "twitter", "url": "https://twitter.com", "label": "Twitter" },
+      { "icon": "facebook", "url": "https://www.facebook.com", "label": "Facebook" },
+      { "icon": "instagram", "url": "https://www.instagram.com", "label": "Instagram" },
+      { "icon": "cloudinary", "url": "https://cloudinary.com", "label": "Cloudinary" },
+      { "icon": "nishith", "url": "https://nishith.is-a.dev", "label": "Nishith" }      
+    ]
   },
   {
-    "id": "nishith",
-    "label": "Nishith",
-    "icon": "user",
-    "url": "https://nishith.is-a.dev"
-  },
-  {
-    "id": "cloudinary",
-    "label": "Cloudinary",
-    "icon": "cloud",
-    "url": "https://cloudinary.com"
-  },
-  {
-    "id": "render",
-    "label": "Render",
+    "id": "cloud",
+    "label": "Cloud",
     "icon": "server",
-    "url": "https://render.com"
+    "children": [
+      { "icon": "aws", "url": "https://aws.amazon.com", "label": "AWS" },
+      { "icon": "azure", "url": "https://azure.microsoft.com", "label": "Azure" },
+      { "icon": "gcp", "url": "https://cloud.google.com", "label": "GCP" },
+      { "icon": "digitalocean", "url": "https://www.digitalocean.com", "label": "DigitalOcean" },
+      { "icon": "vercel", "url": "https://vercel.com", "label": "Vercel" },
+      { "icon": "render", "url": "https://render.com", "label": "Render" }
+    ]
   }
 ]
