@@ -4,14 +4,15 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 // --- CONFIGURATION ---
-// 1. Where is your data file?
-import data from './src/data.json' assert { type: "json" };
-
-// 2. Where should images be saved?
 const OUTPUT_DIR = './public/logos';
+const DATA_FILE = './src/data.json';
 
 // --- SETUP ---
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// 1. Load Data (Using fs instead of import to avoid SyntaxErrors)
+const rawData = fs.readFileSync(DATA_FILE, 'utf-8');
+const data = JSON.parse(rawData);
 
 if (!fs.existsSync(OUTPUT_DIR)){
     fs.mkdirSync(OUTPUT_DIR, { recursive: true });
@@ -27,6 +28,11 @@ const downloadImage = (url, filepath) => {
                     file.close();
                     resolve();
                 });
+            } else if (res.statusCode === 301 || res.statusCode === 302) {
+                // Handle basic redirects (DuckDuckGo sometimes redirects)
+                downloadImage(res.headers.location, filepath)
+                    .then(resolve)
+                    .catch(reject);
             } else {
                 reject(`Status Code: ${res.statusCode}`);
             }
@@ -40,10 +46,7 @@ const processItems = async () => {
     // Flatten all items (Parents + Children) into one list
     let allItems = [];
     data.forEach(group => {
-        // Add the group itself if it has a URL? Usually groups don't, but let's check.
         if(group.url) allItems.push(group);
-        
-        // Add all children
         if(group.children) {
             allItems = allItems.concat(group.children);
         }
@@ -52,17 +55,24 @@ const processItems = async () => {
     console.log(`🔍 Found ${allItems.length} items. Starting download...`);
 
     for (const item of allItems) {
+        // Skip if no URL
         if (!item.url) continue;
 
         try {
             const domain = new URL(item.url).hostname;
-            // Clean the label to make a valid filename (e.g., "AI Tools" -> "ai_tools.png")
+            
+            // Clean filename: "AI Tools" -> "ai_tools.png"
             const filename = item.label.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.png';
             const filepath = path.join(OUTPUT_DIR, filename);
 
-            // Use DuckDuckGo's Icon Service (High Quality PNGs, easier to download than Google)
+            // Skip if already exists (saves time on re-runs)
+            if (fs.existsSync(filepath)) {
+                console.log(`⏩ Skipped (Exists): ${filename}`);
+                continue;
+            }
+
+            // High Quality Icon Service (DuckDuckGo)
             const iconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`; 
-            // OR use Google: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
 
             await downloadImage(iconUrl, filepath);
             console.log(`✅ Saved: ${filename}`);
