@@ -40,7 +40,7 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     const groupRef = useRef();
     const [hovered, setHover] = useState(false);
 
-    const texturePath = TEXTURE_PATHS[index % TEXTURE_PATHS.length];
+    const textureToLoad = item.img || TEXTURE_PATHS[index % TEXTURE_PATHS.length];
     const texture = useTexture(texturePath);
 
     // Calculate position
