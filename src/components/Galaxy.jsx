@@ -40,13 +40,21 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     const groupRef = useRef();
     const [hovered, setHover] = useState(false);
 
-    // --- LOGIC UPDATE: PRIORITY TEXTURES ---
-    // 1. If the JSON item has an 'img', use it.
-    // 2. Otherwise, fall back to the random planet list.
-    const textureToLoad = item.img || TEXTURE_PATHS[index % TEXTURE_PATHS.length];
-    
-    // Load the decided texture
-    const texture = useTexture(textureToLoad);
+    // --- SMART TEXTURE LOGIC ---
+    let textureUrl = TEXTURE_PATHS[index % TEXTURE_PATHS.length]; // Default fallback
+
+    if (item.img) {
+        // 1. Use custom image if you added one to JSON
+        textureUrl = item.img;
+    } else if (item.url && isChild) {
+        // 2. If it's a child link, auto-fetch its logo from Google
+        // "sz=64" asks for a 64x64px image (good for spheres)
+        const domain = new URL(item.url).hostname;
+        textureUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    }
+
+    // Load the texture (this hook handles caching automatically)
+    const texture = useTexture(textureUrl);
 
     // Calculate position
     const angle = (index / total) * Math.PI * 2;
