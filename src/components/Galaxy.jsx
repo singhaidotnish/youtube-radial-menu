@@ -1,9 +1,10 @@
-import React, { useRef, useState, Suspense } from 'react';
+import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Stars, Text, Html, useTexture, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-// 1. TEXTURE PATHS
+// --- CONFIGURATION ---
+// 1. GENERIC PLANET TEXTURES (For Main Categories like "AI Tools", "Coding")
 const TEXTURE_PATHS = [
     "/youtube-radial-menu/textures/one.jpg",
     "/youtube-radial-menu/textures/02.png",
@@ -16,55 +17,65 @@ const TEXTURE_PATHS = [
     "/youtube-radial-menu/textures/09.jpeg"
 ];
 
-function Sun({ onReset }) {
-    const sunRef = useRef();
-    return (
-        <group onClick={onReset} ref={sunRef}>
-            <mesh>
-                <sphereGeometry args={[2.65, 32, 32]} />
-                <meshBasicMaterial color="white" side={THREE.BackSide} />
-            </mesh>
-            <mesh>
-                <sphereGeometry args={[2.5, 32, 32]} />
-                <meshBasicMaterial color="#ffaa00" toneMapped={false} />
-            </mesh>
-            <Text position={[0, 0, 2.7]} fontSize={0.8} color="white" fontWeight="bold" anchorX="center" anchorY="middle">
-                START
-            </Text>
-        </group>
-    )
-}
+// 2. FALLBACK IMAGE (Used if a specific logo is missing)
+const PLACEHOLDER_LOGO = "/youtube-radial-menu/logos/placeholder.png"; 
 
 function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     const meshRef = useRef();
     const groupRef = useRef();
     const [hovered, setHover] = useState(false);
 
-    // --- SMART TEXTURE LOGIC ---
-    let textureUrl = TEXTURE_PATHS[index % TEXTURE_PATHS.length]; // Default fallback
-
-    if (item.img) {
-        // 1. Use custom image if you added one to JSON
-        textureUrl = item.img;
-    } else if (item.url && isChild) {
-        // 2. If it's a child link, auto-fetch its logo from Google
-        // "sz=64" asks for a 64x64px image (good for spheres)
-        const domain = new URL(item.url).hostname;
-        textureUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+    // --- LOGIC: TEXTURE VS LOGO ---
+    
+    // Step A: Determine the "Ideal" path
+    let idealPath;
+    if (isChild && item.label) {
+        // It is a SATELLITE -> It needs a specific LOGO
+        const filename = item.label.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.png';
+        idealPath = `/youtube-radial-menu/logos/${filename}`;
+    } else {
+        // It is a MAIN PLANET -> It needs a generic PLANET TEXTURE
+        idealPath = PLANET_TEXTURES[index % PLANET_TEXTURES.length];
     }
 
-    // Load the texture (this hook handles caching automatically)
-    const texture = useTexture(textureUrl);
+    // Step B: Set the initial state
+    // - Main planets? We assume they exist (safe).
+    // - Satellites? Start with placeholder while we check if the real logo exists.
+    const [activeTexture, setActiveTexture] = useState(
+        isChild ? PLACEHOLDER_LOGO : idealPath
+    );
 
-    // Calculate position
+    // Step C: Image Checker (Only for Satellites)
+    useEffect(() => {
+        if (!isChild) return; // Don't check main planets
+
+        const img = new Image();
+        img.src = idealPath;
+
+        img.onload = () => {
+            // Found it! Use the real logo.
+            setActiveTexture(idealPath);
+        };
+
+        img.onerror = () => {
+            // Missing! Keep using the placeholder (or switch to generic planet).
+            console.warn(`Logo missing: ${item.label}. Using placeholder.`);
+            // Optional: If you prefer missing logos to look like planets instead of placeholders:
+            // setActiveTexture(PLANET_TEXTURES[index % PLANET_TEXTURES.length]); 
+        };
+    }, [idealPath, isChild, index]); // Re-run if item changes
+
+    // Load the decided texture
+    const texture = useTexture(activeTexture);
+
+    // Position Math
     const angle = (index / total) * Math.PI * 2;
     const x = Math.cos(angle) * radiusX;
     const z = Math.sin(angle) * radiusZ;
 
     return (
         <group ref={groupRef} position={[x, 0, z]}>
-            
-            {/* Dashed Orbit Line (Only for children) */}
+            {/* Orbit Ring (Visual aid for satellites) */}
             {isChild && (
                  <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-x, 0, -z]}>
                     <ringGeometry args={[radiusX - 0.05, radiusX + 0.05, 32]} />
@@ -81,7 +92,9 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                 onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
                 onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             >
-                {/* Sphere */}
+                {/* Satellites are smaller (0.6). 
+                   Main planets are larger (1.2).
+                */}
                 <sphereGeometry args={[isChild ? 0.6 : 1.2, 32, 32]} />
                 <meshStandardMaterial 
                     map={texture} 
@@ -128,13 +141,11 @@ export default function Galaxy({ showSolarSystem, items }) {
 
     const activeGroup = items.find(i => i.id === activeGroupId);
     
-    // --- CALCULATE PARENT POSITION ---
-    // If a group is active, we need to know WHERE it is to put the children around it.
+    // Calculate Center for Satellites
     let parentPosition = [0, 0, 0];
     if (activeGroup) {
         const parentIndex = items.findIndex(i => i.id === activeGroupId);
         const parentAngle = (parentIndex / items.length) * Math.PI * 2;
-        // MUST match the radiusX/Z of the main planets (12)
         parentPosition = [
             Math.cos(parentAngle) * 12,
             0,
@@ -154,7 +165,7 @@ export default function Galaxy({ showSolarSystem, items }) {
                 <Suspense fallback={null}>
                     <Sun onReset={() => setActiveGroupId(null)} />
                     
-                    {/* 1. INNER RING (Main Planets) */}
+                    {/* 1. MAIN PLANETS (Generic Textures) */}
                     {items.map((item, index) => (
                         <Planet 
                             key={item.id || index}
@@ -164,13 +175,12 @@ export default function Galaxy({ showSolarSystem, items }) {
                             radiusX={12} 
                             radiusZ={12} 
                             onClick={handlePlanetClick}
-                            isChild={false}
+                            isChild={false} // <--- Forces use of PLANET_TEXTURES
                         />
                     ))}
 
-                    {/* 2. SATELLITES (Children of Active Group) */}
+                    {/* 2. SATELLITES (Specific Logos) */}
                     {activeGroup && activeGroup.children && (
-                        // We shift this entire group to the Parent's [x, 0, z] coordinates
                         <group position={parentPosition}>
                             {activeGroup.children.map((child, index) => (
                                 <Planet 
@@ -178,10 +188,10 @@ export default function Galaxy({ showSolarSystem, items }) {
                                     item={child} 
                                     index={index} 
                                     total={activeGroup.children.length} 
-                                    radiusX={4}  // Small radius (orbiting the parent)
+                                    radiusX={4} 
                                     radiusZ={4} 
                                     onClick={handlePlanetClick}
-                                    isChild={true}
+                                    isChild={true} // <--- Forces use of LOGOS (or Placeholder)
                                 />
                             ))}
                         </group>
