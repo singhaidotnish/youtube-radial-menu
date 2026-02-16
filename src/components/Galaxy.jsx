@@ -4,20 +4,21 @@ import { Stars, Text, Html, useTexture, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three';
 
 // --- CONFIGURATION ---
-// 1. GENERIC PLANET TEXTURES (Updated List)
+
+// 1. GENERIC PLANET TEXTURES (Your Exact List)
 const PLANET_TEXTURES = [
     "/youtube-radial-menu/textures/one.jpg",
-    "/youtube-radial-menu/textures/02.png",   // Note: .png
-    "/youtube-radial-menu/textures/03.jpeg",  // Note: .jpeg
+    "/youtube-radial-menu/textures/02.png",   // .png
+    "/youtube-radial-menu/textures/03.jpeg",  // .jpeg
     "/youtube-radial-menu/textures/04.jpg",
     "/youtube-radial-menu/textures/05.jpg",
     "/youtube-radial-menu/textures/06.jpg",
     "/youtube-radial-menu/textures/07.jpg",
     "/youtube-radial-menu/textures/08.jpg",
-    "/youtube-radial-menu/textures/09.jpeg"   // Note: .jpeg
+    "/youtube-radial-menu/textures/09.jpeg"   // .jpeg
 ];
 
-// 2. FALLBACK IMAGE (Prevents white screen if logo is missing)
+// 2. FALLBACK IMAGE (Prevents white screen/crash if a specific logo is missing)
 const PLACEHOLDER_LOGO = "/youtube-radial-menu/logos/placeholder.png"; 
 
 // --- COMPONENT: THE SUN (Center Button) ---
@@ -57,7 +58,7 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
         const filename = item.label.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.png';
         idealPath = `/youtube-radial-menu/logos/${filename}`;
     } else {
-        // Main planets use generic textures from your new list
+        // Main planets use generic textures from your list
         idealPath = PLANET_TEXTURES[index % PLANET_TEXTURES.length];
     }
 
@@ -79,9 +80,11 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
 
         img.onerror = () => {
             // Failed! Keep showing placeholder.
+            // console.warn(`Logo missing: ${item.label}`); 
         };
     }, [idealPath, isChild]);
 
+    // Load the texture (Suspense handles the waiting)
     const texture = useTexture(activeTexture);
 
     // Position Math
@@ -108,6 +111,9 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                 onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
                 onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             >
+                {/* Child = Smaller (0.6)
+                    Parent = Larger (1.2)
+                */}
                 <sphereGeometry args={[isChild ? 0.6 : 1.2, 32, 32]} />
                 <meshStandardMaterial 
                     map={texture} 
@@ -147,71 +153,17 @@ export default function Galaxy({ showSolarSystem, items }) {
 
     const handlePlanetClick = (item) => {
         if (item.children && item.children.length > 0) {
+            // Toggle folder open/close
             setActiveGroupId(activeGroupId === item.id ? null : item.id);
         } else if (item.url) {
+            // Open Link
             window.open(item.url, '_blank');
         }
     };
 
     const activeGroup = items.find(i => i.id === activeGroupId);
     
-    // Calculate Parent Position
+    // Calculate Parent Position to center satellites around the active planet
     let parentPosition = [0, 0, 0];
     if (activeGroup) {
         const parentIndex = items.findIndex(i => i.id === activeGroupId);
-        const parentAngle = (parentIndex / items.length) * Math.PI * 2;
-        parentPosition = [
-            Math.cos(parentAngle) * 12,
-            0,
-            Math.sin(parentAngle) * 12
-        ];
-    }
-
-    return (
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, background: 'black' }}>
-            <Canvas camera={{ position: [0, 25, 30], fov: 45 }}>
-                <ambientLight intensity={0.3} />
-                <pointLight position={[0, 0, 0]} intensity={250} color="#ffaa00" distance={50} decay={2} />
-                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
-                
-                <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
-
-                <Suspense fallback={null}>
-                    <Sun onReset={() => setActiveGroupId(null)} />
-                    
-                    {/* 1. MAIN PLANETS */}
-                    {items.map((item, index) => (
-                        <Planet 
-                            key={item.id || index}
-                            item={item} 
-                            index={index} 
-                            total={items.length} 
-                            radiusX={12} 
-                            radiusZ={12} 
-                            onClick={handlePlanetClick}
-                            isChild={false} 
-                        />
-                    ))}
-
-                    {/* 2. SATELLITES */}
-                    {activeGroup && activeGroup.children && (
-                        <group position={parentPosition}>
-                            {activeGroup.children.map((child, index) => (
-                                <Planet 
-                                    key={child.id || index}
-                                    item={child} 
-                                    index={index} 
-                                    total={activeGroup.children.length} 
-                                    radiusX={4} 
-                                    radiusZ={4} 
-                                    onClick={handlePlanetClick}
-                                    isChild={true} 
-                                />
-                            ))}
-                        </group>
-                    )}
-                </Suspense>
-            </Canvas>
-        </div>
-    );
-}
