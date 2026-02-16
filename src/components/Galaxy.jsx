@@ -167,3 +167,60 @@ export default function Galaxy({ showSolarSystem, items }) {
     let parentPosition = [0, 0, 0];
     if (activeGroup) {
         const parentIndex = items.findIndex(i => i.id === activeGroupId);
+        const parentAngle = (parentIndex / items.length) * Math.PI * 2;
+        parentPosition = [
+            Math.cos(parentAngle) * 12,
+            0,
+            Math.sin(parentAngle) * 12
+        ];
+    }
+
+    return (
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, background: 'black' }}>
+            <Canvas camera={{ position: [0, 25, 30], fov: 45 }}>
+                <ambientLight intensity={0.3} />
+                <pointLight position={[0, 0, 0]} intensity={250} color="#ffaa00" distance={50} decay={2} />
+                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+                
+                <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
+
+                <Suspense fallback={null}>
+                    {/* The Sun (Center Reset Button) */}
+                    <Sun onReset={() => setActiveGroupId(null)} />
+                    
+                    {/* 1. MAIN PLANETS */}
+                    {items.map((item, index) => (
+                        <Planet 
+                            key={item.id || index}
+                            item={item} 
+                            index={index} 
+                            total={items.length} 
+                            radiusX={12} 
+                            radiusZ={12} 
+                            onClick={handlePlanetClick}
+                            isChild={false} 
+                        />
+                    ))}
+
+                    {/* 2. SATELLITES (Children of Active Group) */}
+                    {activeGroup && activeGroup.children && (
+                        <group position={parentPosition}>
+                            {activeGroup.children.map((child, index) => (
+                                <Planet 
+                                    key={child.id || index}
+                                    item={child} 
+                                    index={index} 
+                                    total={activeGroup.children.length} 
+                                    radiusX={4} 
+                                    radiusZ={4} 
+                                    onClick={handlePlanetClick}
+                                    isChild={true} 
+                                />
+                            ))}
+                        </group>
+                    )}
+                </Suspense>
+            </Canvas>
+        </div>
+    );
+}
