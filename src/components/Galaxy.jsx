@@ -4,22 +4,45 @@ import { Stars, Text, Html, useTexture, OrbitControls } from '@react-three/drei'
 import * as THREE from 'three';
 
 // --- CONFIGURATION ---
-// 1. GENERIC PLANET TEXTURES (For Main Categories like "AI Tools", "Coding")
-const TEXTURE_PATHS = [
+// 1. GENERIC PLANET TEXTURES (Updated List)
+const PLANET_TEXTURES = [
     "/youtube-radial-menu/textures/one.jpg",
-    "/youtube-radial-menu/textures/02.png",
-    "/youtube-radial-menu/textures/03.jpeg",
+    "/youtube-radial-menu/textures/02.png",   // Note: .png
+    "/youtube-radial-menu/textures/03.jpeg",  // Note: .jpeg
     "/youtube-radial-menu/textures/04.jpg",
     "/youtube-radial-menu/textures/05.jpg",
     "/youtube-radial-menu/textures/06.jpg",
     "/youtube-radial-menu/textures/07.jpg",
     "/youtube-radial-menu/textures/08.jpg",
-    "/youtube-radial-menu/textures/09.jpeg"
+    "/youtube-radial-menu/textures/09.jpeg"   // Note: .jpeg
 ];
 
-// 2. FALLBACK IMAGE (Used if a specific logo is missing)
+// 2. FALLBACK IMAGE (Prevents white screen if logo is missing)
 const PLACEHOLDER_LOGO = "/youtube-radial-menu/logos/placeholder.png"; 
 
+// --- COMPONENT: THE SUN (Center Button) ---
+function Sun({ onReset }) {
+    const sunRef = useRef();
+    return (
+        <group onClick={onReset} ref={sunRef}>
+            {/* White Outline */}
+            <mesh>
+                <sphereGeometry args={[2.65, 32, 32]} />
+                <meshBasicMaterial color="white" side={THREE.BackSide} />
+            </mesh>
+            {/* Orange Core */}
+            <mesh>
+                <sphereGeometry args={[2.5, 32, 32]} />
+                <meshBasicMaterial color="#ffaa00" toneMapped={false} />
+            </mesh>
+            <Text position={[0, 0, 2.7]} fontSize={0.8} color="white" fontWeight="bold" anchorX="center" anchorY="middle">
+                START
+            </Text>
+        </group>
+    )
+}
+
+// --- COMPONENT: PLANET (Handles Textures & Logos) ---
 function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     const meshRef = useRef();
     const groupRef = useRef();
@@ -27,45 +50,38 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
 
     // --- LOGIC: TEXTURE VS LOGO ---
     
-    // Step A: Determine the "Ideal" path
+    // 1. Determine the "Ideal" path (The specific logo we WANT)
     let idealPath;
     if (isChild && item.label) {
-        // It is a SATELLITE -> It needs a specific LOGO
+        // Example: "AI Tools" -> "ai_tools.png"
         const filename = item.label.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.png';
         idealPath = `/youtube-radial-menu/logos/${filename}`;
     } else {
-        // It is a MAIN PLANET -> It needs a generic PLANET TEXTURE
+        // Main planets use generic textures from your new list
         idealPath = PLANET_TEXTURES[index % PLANET_TEXTURES.length];
     }
 
-    // Step B: Set the initial state
-    // - Main planets? We assume they exist (safe).
-    // - Satellites? Start with placeholder while we check if the real logo exists.
+    // 2. State: Start with Placeholder (Safe) for children, or Texture for parents
     const [activeTexture, setActiveTexture] = useState(
         isChild ? PLACEHOLDER_LOGO : idealPath
     );
 
-    // Step C: Image Checker (Only for Satellites)
+    // 3. Image Checker: Secretly try to load the logo. If found, swap it in.
     useEffect(() => {
-        if (!isChild) return; // Don't check main planets
+        if (!isChild) return; 
 
         const img = new Image();
         img.src = idealPath;
 
         img.onload = () => {
-            // Found it! Use the real logo.
-            setActiveTexture(idealPath);
+            setActiveTexture(idealPath); // Success! Show real logo.
         };
 
         img.onerror = () => {
-            // Missing! Keep using the placeholder (or switch to generic planet).
-            console.warn(`Logo missing: ${item.label}. Using placeholder.`);
-            // Optional: If you prefer missing logos to look like planets instead of placeholders:
-            // setActiveTexture(PLANET_TEXTURES[index % PLANET_TEXTURES.length]); 
+            // Failed! Keep showing placeholder.
         };
-    }, [idealPath, isChild, index]); // Re-run if item changes
+    }, [idealPath, isChild]);
 
-    // Load the decided texture
     const texture = useTexture(activeTexture);
 
     // Position Math
@@ -75,7 +91,7 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
 
     return (
         <group ref={groupRef} position={[x, 0, z]}>
-            {/* Orbit Ring (Visual aid for satellites) */}
+            {/* Orbit Ring for Satellites */}
             {isChild && (
                  <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-x, 0, -z]}>
                     <ringGeometry args={[radiusX - 0.05, radiusX + 0.05, 32]} />
@@ -92,9 +108,6 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
                 onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
                 onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
             >
-                {/* Satellites are smaller (0.6). 
-                   Main planets are larger (1.2).
-                */}
                 <sphereGeometry args={[isChild ? 0.6 : 1.2, 32, 32]} />
                 <meshStandardMaterial 
                     map={texture} 
@@ -126,6 +139,7 @@ function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
     );
 }
 
+// --- MAIN COMPONENT: GALAXY ---
 export default function Galaxy({ showSolarSystem, items }) {
     const [activeGroupId, setActiveGroupId] = useState(null);
 
@@ -141,7 +155,7 @@ export default function Galaxy({ showSolarSystem, items }) {
 
     const activeGroup = items.find(i => i.id === activeGroupId);
     
-    // Calculate Center for Satellites
+    // Calculate Parent Position
     let parentPosition = [0, 0, 0];
     if (activeGroup) {
         const parentIndex = items.findIndex(i => i.id === activeGroupId);
@@ -165,7 +179,7 @@ export default function Galaxy({ showSolarSystem, items }) {
                 <Suspense fallback={null}>
                     <Sun onReset={() => setActiveGroupId(null)} />
                     
-                    {/* 1. MAIN PLANETS (Generic Textures) */}
+                    {/* 1. MAIN PLANETS */}
                     {items.map((item, index) => (
                         <Planet 
                             key={item.id || index}
@@ -175,11 +189,11 @@ export default function Galaxy({ showSolarSystem, items }) {
                             radiusX={12} 
                             radiusZ={12} 
                             onClick={handlePlanetClick}
-                            isChild={false} // <--- Forces use of PLANET_TEXTURES
+                            isChild={false} 
                         />
                     ))}
 
-                    {/* 2. SATELLITES (Specific Logos) */}
+                    {/* 2. SATELLITES */}
                     {activeGroup && activeGroup.children && (
                         <group position={parentPosition}>
                             {activeGroup.children.map((child, index) => (
@@ -191,7 +205,7 @@ export default function Galaxy({ showSolarSystem, items }) {
                                     radiusX={4} 
                                     radiusZ={4} 
                                     onClick={handlePlanetClick}
-                                    isChild={true} // <--- Forces use of LOGOS (or Placeholder)
+                                    isChild={true} 
                                 />
                             ))}
                         </group>
