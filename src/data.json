@@ -69,7 +69,6 @@
       { "icon": "cloudinary", "url": "https://cloudinary.com", "label": "Cloudinary" },
       { "icon": "nishith", "url": "https://nishith.is-a.dev", "label": "Nishith" },      
       { "icon": "aws", "url": "https://aws.amazon.com", "label": "AWS" },
-      { "icon": "azure", "url": "https://azure.microsoft.com", "label": "Azure" },
       { "icon": "gcp", "url": "https://cloud.google.com", "label": "GCP" },
       { "icon": "digitalocean", "url": "https://www.digitalocean.com", "label": "DigitalOcean" },
       { "icon": "vercel", "url": "https://vercel.com", "label": "Vercel" },
