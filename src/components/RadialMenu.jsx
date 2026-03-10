@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Youtube, Code, TrendingUp, Activity, Sun, DollarSign, 
-  Heart, User, Utensils, MessageCircle, HelpCircle, Link,
-  Bot, Search, Mic, Video, Image, Brain, Building, Cloud, Server
+  Link as LinkIcon, Code, TrendingUp, Activity, Sun, DollarSign, 
+  Heart, User, Utensils, MessageCircle, HelpCircle, Bot, Search, 
+  Mic, Video, Image, Brain, Building, Cloud, Server
 } from "lucide-react";
 import "./RadialMenu.css";
-import data from '../data.json';
 
-// --- Math Helpers ---
+// --- MATH HELPERS ---
 const polarToCartesian = (radius, angleInDegrees) => {
   const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
   return {
@@ -22,7 +21,6 @@ const getSectorPath = (outerRadius, innerRadius, startAngle, endAngle) => {
   const end = polarToCartesian(outerRadius, startAngle);
   const startInner = polarToCartesian(innerRadius, endAngle);
   const endInner = polarToCartesian(innerRadius, startAngle);
-
   const largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
 
   return [
@@ -34,8 +32,9 @@ const getSectorPath = (outerRadius, innerRadius, startAngle, endAngle) => {
   ].join(" ");
 };
 
+// --- ICON MAP ---
 const ICON_MAP = {
-  youtube: <Youtube size={24} />,
+  youtube: <Video size={24} />,
   activity: <Activity size={20} />,
   sun: <Sun size={20} />,
   trending: <TrendingUp size={20} />,
@@ -55,12 +54,15 @@ const ICON_MAP = {
   building: <Building size={20} />,
   cloud: <Cloud size={20} />,
   server: <Server size={20} />,
-  link: <Link size={20} />
+  link: <LinkIcon size={20} />
 };
 
-const RadialMenu = () => {
+// --- MAIN COMPONENT ---
+// We now accept 'items' as a prop from App.jsx
+const RadialMenu = ({ items }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState(null);
+  const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, text: '' });
   
   // CONFIGURATION
   const GAP = 2; 
@@ -68,96 +70,64 @@ const RadialMenu = () => {
   const R1_OUTER = 140; 
   const R2_INNER = 145;
   const R2_OUTER = 230;
-  
-  const items = data;
-  
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-    setActiveGroup(null);
-  };
 
+  const toggleMenu = () => setIsOpen(!isOpen);
+  
   const handleGroupClick = (e, groupId) => {
     e.preventDefault();
     e.stopPropagation();
     setActiveGroup(activeGroup === groupId ? null : groupId);
   };
 
+  // --- MOUSE HANDLERS ---
+  const handleMouseEnter = (e, text) => {
+    setTooltip({ show: true, x: e.clientX, y: e.clientY, text });
+  };
+  const handleMouseMove = (e) => {
+    setTooltip(prev => ({ ...prev, x: e.clientX, y: e.clientY }));
+  };
+  const handleMouseLeave = () => {
+    setTooltip(prev => ({ ...prev, show: false }));
+  };
+
+  // --- RENDER SLICE ---
   const renderSlice = (item, index, total, innerR, outerR, isGroupParent) => {
     const sliceAngle = 360 / total;
     const startAngle = (index * sliceAngle) + (GAP / 2);
     const endAngle = ((index + 1) * sliceAngle) - (GAP / 2);
-    
-    // 1. Calculate the Shape Path
     const pathData = getSectorPath(outerR, innerR, startAngle, endAngle);
     
-    // 2. Calculate Center Point (for icon or image positioning)
     const midAngle = startAngle + (sliceAngle - GAP)/2;
     const iconRadius = innerR + (outerR - innerR) / 2;
     const pos = polarToCartesian(iconRadius, midAngle);
-
-    // 3. Highlight Logic
     const isActive = activeGroup === item.id;
-    const defaultFill = "rgba(30, 35, 40, 0.85)";
-    const activeFill = "#d4a017";
-
-    // 4. Unique ID for clipping (Essential!)
     const clipId = `clip-${isGroupParent ? 'parent' : 'child'}-${index}`;
-
-    // Image Sizing (make it big enough to cover the whole wedge)
     const imgSize = 160; 
 
     return (
       <g 
-        key={item.label || index} 
+        key={item.id || index} 
         className="slice-group"
         onClick={(e) => isGroupParent && item.children ? handleGroupClick(e, item.id) : null}
+        onMouseEnter={(e) => handleMouseEnter(e, item.label)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
       >
-        <a 
-          href={item.children ? "#" : item.url} 
-          target={item.children ? "_self" : "_blank"}
-          rel="noopener noreferrer"
-        >
-          {/* A. If it's an Image, we render it CLIPPED by the path */}
+        <a href={item.children ? "#" : item.url} target={item.children ? "_self" : "_blank"} rel="noopener noreferrer">
           {item.img && (
             <>
-              <defs>
-                <clipPath id={clipId}>
-                  <path d={pathData} />
-                </clipPath>
-              </defs>
-              <image 
-                href={item.img} 
-                x={pos.x - (imgSize/2)} 
-                y={pos.y - (imgSize/2)} 
-                width={imgSize} 
-                height={imgSize} 
-                preserveAspectRatio="xMidYMid slice" // This acts like object-fit: cover
-                clipPath={`url(#${clipId})`}
-                className="sector-bg-image"
-              />
+              <defs><clipPath id={clipId}><path d={pathData} /></clipPath></defs>
+              <image href={item.img} x={pos.x - (imgSize/2)} y={pos.y - (imgSize/2)} width={imgSize} height={imgSize} preserveAspectRatio="xMidYMid slice" clipPath={`url(#${clipId})`} />
             </>
           )}
-
-          {/* B. The Interaction Layer (Stroke & Overlay) */}
-          {/* If there is an image, we make the fill semi-transparent so the image shows through */}
           <path 
             d={pathData} 
-            fill={item.img ? (isActive ? "rgba(212, 160, 23, 0.4)" : "rgba(0,0,0,0.4)") : (isActive ? activeFill : defaultFill)} 
-            stroke="rgba(255,255,255,0.2)"
-            strokeWidth="1"
-            className="slice-path"
+            fill={item.img ? (isActive ? "rgba(212, 160, 23, 0.4)" : "rgba(0,0,0,0.4)") : (isActive ? "#d4a017" : "rgba(30, 35, 40, 0.85)")} 
+            stroke="rgba(255,255,255,0.2)" strokeWidth="1" className="slice-path"
           />
-
-          {/* C. The Icon (Only show if NO image) */}
           {!item.img && (
-            <foreignObject 
-              x={pos.x - 14} 
-              y={pos.y - 14} 
-              width="28" 
-              height="28" 
-              style={{ color: isActive ? "black" : "#ddd", pointerEvents: "none" }}
-            >
-              <div className="slice-icon">{ICON_MAP[item.icon] || <Link size={20} />}</div>
+            <foreignObject x={pos.x - 14} y={pos.y - 14} width="28" height="28" style={{ color: isActive ? "black" : "#ddd", pointerEvents: "none" }}>
+              <div className="slice-icon">{ICON_MAP[item.icon] || <LinkIcon size={20} />}</div>
             </foreignObject>
           )}
         </a>
@@ -169,22 +139,12 @@ const RadialMenu = () => {
     <div className="radial-wrapper">
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            className="menu-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsOpen(false)}
-          />
+          <motion.div className="menu-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsOpen(false)} />
         )}
       </AnimatePresence>
 
       <div className="menu-container">
-        <motion.button
-          className="trigger-btn"
-          onClick={toggleMenu}
-          whileTap={{ scale: 0.95 }}
-        >
+        <motion.button className="trigger-btn" onClick={toggleMenu} whileTap={{ scale: 0.95 }}>
            START
         </motion.button>
 
@@ -198,15 +158,11 @@ const RadialMenu = () => {
               transition={{ type: "spring", stiffness: 200, damping: 20 }}
             >
               <svg width="600" height="600" viewBox="-300 -300 600 600" style={{ overflow: 'visible' }}>
-                {items.map((item, index) => 
-                  renderSlice(item, index, items.length, R1_INNER, R1_OUTER, true)
-                )}
+                {items.map((item, index) => renderSlice(item, index, items.length, R1_INNER, R1_OUTER, true))}
                 {activeGroup && (() => {
                   const group = items.find(i => i.id === activeGroup);
                   if (group && group.children) {
-                    return group.children.map((child, idx) => 
-                      renderSlice(child, idx, group.children.length, R2_INNER, R2_OUTER, false)
-                    );
+                    return group.children.map((child, idx) => renderSlice(child, idx, group.children.length, R2_INNER, R2_OUTER, false));
                   }
                 })()}
               </svg>
@@ -214,6 +170,12 @@ const RadialMenu = () => {
           )}
         </AnimatePresence>
       </div>
+
+      {/* TOOLTIP */}
+      {tooltip.show && <div className="radial-tooltip" style={{ top: tooltip.y, left: tooltip.x }}>{tooltip.text}</div>}
+      
+      {/* NOTE: The 'Add' Modal and Button have been removed from here 
+          because they now live in App.jsx and Navbar.jsx */}
     </div>
   );
 };

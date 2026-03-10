@@ -1,143 +1,226 @@
-import React, { useRef, useState } from 'react';
-import { Canvas, useFrame, useLoader } from '@react-three/fiber';
-import { OrbitControls, Stars, Text, Float } from '@react-three/drei';
+import React, { useRef, useState, useEffect, Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Stars, Text, Html, useTexture, OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
-import data from '../data.json';
 
-const fallbackImg = "https://placehold.co/64x64/orange/white?text=?";
+// --- CONFIGURATION ---
 
-// --- MOON (Satellites) ---
-function Moon({ item, index, total, radius }) {
-  const meshRef = useRef();
-  const angle = (index / total) * Math.PI * 2;
-  const x = radius * Math.cos(angle);
-  const z = radius * Math.sin(angle);
+// 1. GENERIC PLANET TEXTURES (Your Exact List)
+const PLANET_TEXTURES = [
+    "/youtube-radial-menu/textures/one.jpg",
+    "/youtube-radial-menu/textures/02.png",   // .png
+    "/youtube-radial-menu/textures/03.jpeg",  // .jpeg
+    "/youtube-radial-menu/textures/04.jpg",
+    "/youtube-radial-menu/textures/05.jpg",
+    "/youtube-radial-menu/textures/06.jpg",
+    "/youtube-radial-menu/textures/07.jpg",
+    "/youtube-radial-menu/textures/08.jpg",
+    "/youtube-radial-menu/textures/09.jpeg"   // .jpeg
+];
 
-  const imgUrl = item.img ? item.img : fallbackImg;
-  const texture = useLoader(THREE.TextureLoader, imgUrl);
+// 2. FALLBACK IMAGE (Prevents white screen/crash if a specific logo is missing)
+const PLACEHOLDER_LOGO = "/youtube-radial-menu/logos/placeholder.png"; 
 
-  useFrame((state, delta) => {
-    meshRef.current.rotation.y += delta * 1; 
-  });
-
-  return (
-    <group position={[x, 0, z]}>
-      <Float speed={4} rotationIntensity={1} floatIntensity={1}>
-        <mesh ref={meshRef} onClick={(e) => {
-            e.stopPropagation();
-            if(item.url) window.open(item.url, "_blank");
-        }}>
-          {/* SPHERE GEOMETRY -> Makes it look like a moon */}
-          <sphereGeometry args={[0.6, 32, 32]} />
-          <meshStandardMaterial map={texture} />
-        </mesh>
-        <Text position={[0, -1, 0]} fontSize={0.2} color="#cccccc" anchorX="center" anchorY="middle">
-          {item.label}
-        </Text>
-      </Float>
-    </group>
-  );
-}
-
-// --- PLANET ---
-function Planet({ item, index, total, radius, isActive, onClick }) {
-  const meshRef = useRef();
-  const groupRef = useRef();
-  
-  const angle = (index / total) * Math.PI * 2;
-  const x = radius * Math.cos(angle);
-  const z = radius * Math.sin(angle);
-
-  const imgUrl = item.img ? item.img : fallbackImg;
-  const texture = useLoader(THREE.TextureLoader, imgUrl);
-
-  useFrame((state, delta) => {
-    if(meshRef.current) meshRef.current.rotation.y += delta * 0.5;
-    if (isActive && groupRef.current) groupRef.current.rotation.y += delta * 0.1;
-  });
-
-  return (
-    <group position={[x, 0, z]}>
-      <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
-        <mesh ref={meshRef} onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-        >
-          {/* SPHERE GEOMETRY -> Makes it look like a planet */}
-          <sphereGeometry args={[1.5, 32, 32]} />
-          <meshStandardMaterial 
-            map={texture} 
-            color={isActive ? "#ffffaa" : "white"} 
-            emissive={isActive ? "#222222" : "black"}
-          />
-        </mesh>
-
-        <Text position={[0, -2.5, 0]} fontSize={0.5} color="white" anchorX="center" anchorY="middle">
-          {item.label}
-        </Text>
-      </Float>
-
-      {isActive && item.children && (
-        <group ref={groupRef}>
-            {/* Orbit Ring */}
-            <mesh rotation={[Math.PI / 2, 0, 0]}>
-                <ringGeometry args={[3.4, 3.5, 64]} />
-                <meshBasicMaterial color="#ffffff" opacity={0.2} transparent side={THREE.DoubleSide} />
-            </mesh>
-            {item.children.map((child, idx) => (
-                <Moon key={idx} item={child} index={idx} total={item.children.length} radius={3.5} />
-            ))}
-        </group>
-      )}
-    </group>
-  );
-}
-
-// --- SUN ---
+// --- COMPONENT: THE SUN (Center Button) ---
 function Sun({ onReset }) {
     const sunRef = useRef();
-    useFrame((state, delta) => (sunRef.current.rotation.y += delta * 0.2));
-
     return (
-        <group onClick={onReset}>
-            <mesh ref={sunRef}>
-                <sphereGeometry args={[2.5, 32, 32]} />
-                {/* MATCHED COLOR: Orange #ffaa00 */}
-                <meshStandardMaterial color="#ffaa00" emissive="#ff4400" emissiveIntensity={2} />
+        <group onClick={onReset} ref={sunRef}>
+            {/* White Outline */}
+            <mesh>
+                <sphereGeometry args={[2.65, 32, 32]} />
+                <meshBasicMaterial color="white" side={THREE.BackSide} />
             </mesh>
-            {/* TEXT ON SUN */}
-            <Text position={[0, 0, 3]} fontSize={0.8} color="white" anchorX="center" anchorY="middle">
+            {/* Orange Core */}
+            <mesh>
+                <sphereGeometry args={[2.5, 32, 32]} />
+                <meshBasicMaterial color="#ffaa00" toneMapped={false} />
+            </mesh>
+            <Text position={[0, 0, 2.7]} fontSize={0.8} color="white" fontWeight="bold" anchorX="center" anchorY="middle">
                 START
             </Text>
         </group>
     )
 }
 
-export default function Galaxy() {
-  const [activeId, setActiveId] = useState(null);
+// --- COMPONENT: PLANET (Handles Textures & Logos) ---
+function Planet({ item, index, total, radiusX, radiusZ, onClick, isChild }) {
+    const meshRef = useRef();
+    const groupRef = useRef();
+    const [hovered, setHover] = useState(false);
 
-  return (
-    // FIX: position: fixed ensures it covers 100% of the screen (no white bars)
-    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'black', zIndex: 1 }}>
-      <Canvas camera={{ position: [0, 25, 20], fov: 45 }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[0, 10, 0]} intensity={2} color="#ffffff" />
-        <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade />
-        <OrbitControls enableZoom={true} minDistance={10} maxDistance={60} />
+    // --- LOGIC: TEXTURE VS LOGO ---
+    
+    // 1. Determine the "Ideal" path (The specific logo we WANT)
+    let idealPath;
+    if (isChild && item.label) {
+        // Example: "AI Tools" -> "ai_tools.png"
+        const filename = item.label.toLowerCase().replace(/[^a-z0-9]/g, '_') + '.png';
+        idealPath = `/youtube-radial-menu/logos/${filename}`;
+    } else {
+        // Main planets use generic textures from your list
+        idealPath = PLANET_TEXTURES[index % PLANET_TEXTURES.length];
+    }
 
-        <Sun onReset={() => setActiveId(null)} />
+    // 2. State: Start with Placeholder (Safe) for children, or Texture for parents
+    const [activeTexture, setActiveTexture] = useState(
+        isChild ? PLACEHOLDER_LOGO : idealPath
+    );
 
-        {data.map((item, index) => (
-          <React.Suspense fallback={null} key={item.id || index}>
-             <Planet 
-                item={item} index={index} total={data.length} radius={10} 
-                isActive={activeId === item.id}
-                onClick={() => setActiveId(activeId === item.id ? null : item.id)}
-             />
-          </React.Suspense>
-        ))}
-      </Canvas>
-    </div>
-  );
+    // 3. Image Checker: Secretly try to load the logo. If found, swap it in.
+    useEffect(() => {
+        if (!isChild) return; 
+
+        const img = new Image();
+        img.src = idealPath;
+
+        img.onload = () => {
+            setActiveTexture(idealPath); // Success! Show real logo.
+        };
+
+        img.onerror = () => {
+            // Failed! Keep showing placeholder.
+            // console.warn(`Logo missing: ${item.label}`); 
+        };
+    }, [idealPath, isChild]);
+
+    // Load the texture (Suspense handles the waiting)
+    const texture = useTexture(activeTexture);
+
+    // Position Math
+    const angle = (index / total) * Math.PI * 2;
+    const x = Math.cos(angle) * radiusX;
+    const z = Math.sin(angle) * radiusZ;
+
+    return (
+        <group ref={groupRef} position={[x, 0, z]}>
+            {/* Orbit Ring for Satellites */}
+            {isChild && (
+                 <mesh rotation={[-Math.PI / 2, 0, 0]} position={[-x, 0, -z]}>
+                    <ringGeometry args={[radiusX - 0.05, radiusX + 0.05, 32]} />
+                    <meshBasicMaterial color="#444" transparent opacity={0.4} side={THREE.DoubleSide} />
+                </mesh>
+            )}
+
+            <mesh 
+                ref={meshRef}
+                onClick={(e) => {
+                    e.stopPropagation(); 
+                    onClick(item);
+                }}
+                onPointerOver={() => { document.body.style.cursor = 'pointer'; setHover(true); }}
+                onPointerOut={() => { document.body.style.cursor = 'auto'; setHover(false); }}
+            >
+                {/* Child = Smaller (0.6)
+                    Parent = Larger (1.2)
+                */}
+                <sphereGeometry args={[isChild ? 0.6 : 1.2, 32, 32]} />
+                <meshStandardMaterial 
+                    map={texture} 
+                    color={hovered ? '#ffaa00' : 'white'} 
+                    roughness={0.8}
+                />
+            </mesh>
+            
+            <Html 
+                position={[0, isChild ? -1.5 : -2.5, 0]} 
+                center 
+                distanceFactor={10} 
+                style={{ pointerEvents: 'none' }}
+            >
+                <div style={{ 
+                    color: hovered ? '#ffaa00' : 'white', 
+                    fontSize: isChild ? '18px' : '30px',
+                    fontWeight: '900', 
+                    whiteSpace: 'nowrap',
+                    textShadow: '0 4px 8px black',
+                    userSelect: 'none',
+                    fontFamily: 'sans-serif',
+                    letterSpacing: '1px'
+                }}>
+                    {item.label}
+                </div>
+            </Html>
+        </group>
+    );
+}
+
+// --- MAIN COMPONENT: GALAXY ---
+export default function Galaxy({ showSolarSystem, items }) {
+    const [activeGroupId, setActiveGroupId] = useState(null);
+
+    if (!showSolarSystem) return null;
+
+    const handlePlanetClick = (item) => {
+        if (item.children && item.children.length > 0) {
+            // Toggle folder open/close
+            setActiveGroupId(activeGroupId === item.id ? null : item.id);
+        } else if (item.url) {
+            // Open Link
+            window.open(item.url, '_blank');
+        }
+    };
+
+    const activeGroup = items.find(i => i.id === activeGroupId);
+    
+    // Calculate Parent Position to center satellites around the active planet
+    let parentPosition = [0, 0, 0];
+    if (activeGroup) {
+        const parentIndex = items.findIndex(i => i.id === activeGroupId);
+        const parentAngle = (parentIndex / items.length) * Math.PI * 2;
+        parentPosition = [
+            Math.cos(parentAngle) * 12,
+            0,
+            Math.sin(parentAngle) * 12
+        ];
+    }
+
+    return (
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, background: 'black' }}>
+            <Canvas camera={{ position: [0, 25, 30], fov: 45 }}>
+                <ambientLight intensity={0.3} />
+                <pointLight position={[0, 0, 0]} intensity={250} color="#ffaa00" distance={50} decay={2} />
+                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+                
+                <OrbitControls enableZoom={true} enablePan={true} enableRotate={true} />
+
+                <Suspense fallback={null}>
+                    {/* The Sun (Center Reset Button) */}
+                    <Sun onReset={() => setActiveGroupId(null)} />
+                    
+                    {/* 1. MAIN PLANETS */}
+                    {items.map((item, index) => (
+                        <Planet 
+                            key={item.id || index}
+                            item={item} 
+                            index={index} 
+                            total={items.length} 
+                            radiusX={12} 
+                            radiusZ={12} 
+                            onClick={handlePlanetClick}
+                            isChild={false} 
+                        />
+                    ))}
+
+                    {/* 2. SATELLITES (Children of Active Group) */}
+                    {activeGroup && activeGroup.children && (
+                        <group position={parentPosition}>
+                            {activeGroup.children.map((child, index) => (
+                                <Planet 
+                                    key={child.id || index}
+                                    item={child} 
+                                    index={index} 
+                                    total={activeGroup.children.length} 
+                                    radiusX={4} 
+                                    radiusZ={4} 
+                                    onClick={handlePlanetClick}
+                                    isChild={true} 
+                                />
+                            ))}
+                        </group>
+                    )}
+                </Suspense>
+            </Canvas>
+        </div>
+    );
 }

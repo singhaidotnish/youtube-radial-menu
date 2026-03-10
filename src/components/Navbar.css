@@ -1,0 +1,58 @@
+.navbar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Full width */
+  height: 80px; /* ample height for buttons */
+  z-index: 20000;
+  
+  display: flex;
+  justify-content: space-between; /* Pushes children to far Left and far Right */
+  align-items: center;
+  padding: 0 40px; /* Distance from edges */
+  box-sizing: border-box;
+
+  /* Visual "Line" effect (Optional: subtle gradient at top) */
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Very faint line */
+
+  /* CRITICAL: Allows clicks to pass through the empty space to the 3D canvas */
+  pointer-events: none; 
+}
+
+/* Re-enable clicking for the actual buttons */
+.nav-add-btn, .switch-wrapper {
+  pointer-events: auto; 
+}
+
+/* The Plus Button Style */
+.nav-add-btn {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #222;
+  border: 1px solid #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.nav-add-btn:hover {
+  background: #ffaa00;
+  border-color: #ffaa00;
+  transform: scale(1.1);
+}
+
+.nav-add-btn:active {
+  transform: scale(0.95);
+}
+
+/* Wrapper for switch to ensure it sits correctly in flexbox */
+.switch-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
