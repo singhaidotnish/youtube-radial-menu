@@ -91,3 +91,52 @@
   border-color: rgba(255,170,0,0.45);
   background: rgba(0,0,0,0.7);
 }
+
+/* Right group: github + add button */
+.right-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+/* GitHub Save Button */
+.nav-github-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: rgba(255,255,255,0.7);
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+}
+
+.nav-github-btn:hover {
+  background: rgba(255,170,0,0.15);
+  border-color: rgba(255,170,0,0.5);
+  color: #ffaa00;
+}
+
+.nav-github-btn.saving {
+  border-color: rgba(255,170,0,0.5);
+  color: #ffaa00;
+  opacity: 0.8;
+}
+
+.nav-github-btn.saved {
+  border-color: rgba(80,200,80,0.6);
+  color: #50c850;
+}
+
+.nav-github-btn.error {
+  border-color: rgba(255,80,80,0.6);
+  color: #ff5050;
+}

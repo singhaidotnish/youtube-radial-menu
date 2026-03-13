@@ -1,9 +1,9 @@
 import React from 'react';
 import ToggleSwitch from './ToggleSwitch';
-import { Plus } from 'lucide-react';
+import { Plus, Github } from 'lucide-react';
 import './Navbar.css';
 
-const Navbar = ({ is3D, onToggle, onAddClick }) => {
+const Navbar = ({ is3D, onToggle, onAddClick, onGithubSave, githubStatus }) => {
   return (
     <div className="navbar-container">
       
@@ -20,14 +20,27 @@ const Navbar = ({ is3D, onToggle, onAddClick }) => {
         </div>
       </div>
 
-      {/* 2. RIGHT SIDE: The Add Button */}
-      <button 
-        className="nav-add-btn" 
-        onClick={onAddClick} 
-        title="Add New Link"
-      >
-        <Plus size={24} color="#fff" />
-      </button>
+      {/* 2. RIGHT SIDE: GitHub Save + Add Button */}
+      <div className="right-group">
+        <button
+          className={`nav-github-btn ${githubStatus}`}
+          onClick={onGithubSave}
+          title="Save to GitHub"
+        >
+          <Github size={18} />
+          <span className="github-btn-label">
+            {githubStatus === 'saving' ? 'Saving...' : githubStatus === 'saved' ? '✓ Saved!' : githubStatus === 'error' ? '✗ Failed' : 'Save to GitHub'}
+          </span>
+        </button>
+
+        <button 
+          className="nav-add-btn" 
+          onClick={onAddClick} 
+          title="Add New Link"
+        >
+          <Plus size={24} color="#fff" />
+        </button>
+      </div>
 
     </div>
   );
