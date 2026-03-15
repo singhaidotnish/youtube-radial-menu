@@ -58,6 +58,14 @@
         "icon": "help",
         "url": "https://youtube.com/@askhavivanything",
         "label": "Haviv"
+      },
+      {
+        "id": 1773544755500,
+        "label": "animalflow",
+        "url": "https://youtube.com/@animalflow?si=8en7UV447HG7-6BM",
+        "icon": "link",
+        "img": null,
+        "children": null
       }
     ]
   },
