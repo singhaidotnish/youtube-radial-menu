@@ -125,11 +125,25 @@ const RadialMenu = ({ items }) => {
             fill={item.img ? (isActive ? "rgba(212, 160, 23, 0.4)" : "rgba(0,0,0,0.4)") : (isActive ? "#d4a017" : "rgba(30, 35, 40, 0.85)")} 
             stroke="rgba(255,255,255,0.2)" strokeWidth="1" className="slice-path"
           />
-          {!item.img && (
-            <foreignObject x={pos.x - 14} y={pos.y - 14} width="28" height="28" style={{ color: isActive ? "black" : "#ddd", pointerEvents: "none" }}>
-              <div className="slice-icon">{ICON_MAP[item.icon] || <LinkIcon size={20} />}</div>
-            </foreignObject>
-          )}
+          {!item.img && (() => {
+            const label = item.label || '';
+            const first = label.charAt(0).toUpperCase();
+            const last  = label.charAt(label.length - 1).toLowerCase();
+            return (
+              <text
+                x={pos.x}
+                y={pos.y - 4}
+                textAnchor="middle"
+                dominantBaseline="central"
+                pointerEvents="none"
+                fontFamily="'Georgia', serif"
+                fill={isActive ? "#000" : "#fff"}
+              >
+                <tspan fontSize="18" fontWeight="900">{first}</tspan>
+                <tspan fontSize="11" fontWeight="400" dy="5">{last}</tspan>
+              </text>
+            );
+          })()}
         </a>
       </g>
     );
