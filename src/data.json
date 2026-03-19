@@ -227,6 +227,14 @@
         "label": "BitWarden",
         "url": "https://vault.bitwarden.com/#/login",
         "icon": "link"
+      },
+      {
+        "id": 1773898835287,
+        "label": "Whatsapp",
+        "url": "https://web.whatsapp.com/",
+        "icon": "link",
+        "img": null,
+        "children": null
       }
     ]
   }
